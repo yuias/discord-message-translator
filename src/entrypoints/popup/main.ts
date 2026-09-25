@@ -1,9 +1,11 @@
-import { getSettings, updateSettings } from '@/lib/utils/settings';
+import { getSettings } from '@/lib/utils/settings';
 import { createStorage } from '@/lib/cache/factory';
-import { ChromeBuiltinTranslator } from '@/lib/api/chrome-builtin';
-import { ChromeLanguageDetector } from '@/lib/api/chrome-language-detector';
 import { populateLanguageSelect, setupPasswordToggle } from '@/lib/utils/dom-helpers';
 import { applyI18n, t } from '@/lib/utils/i18n';
+import { showToast } from '@/lib/ui/toast';
+import { createAutoSaver } from '@/lib/ui/auto-save';
+import { renderCacheStats } from '@/lib/ui/cache-stats';
+import { getTranslatorApiStatus, getLanguageDetectorStatus } from '@/lib/ui/api-availability';
 import './styles.css';
 
 // DOM elements
@@ -37,12 +39,14 @@ const cacheEntryCount = document.getElementById('cacheEntryCount') as HTMLSpanEl
 const cacheExpiredCount = document.getElementById('cacheExpiredCount') as HTMLSpanElement;
 const refreshCacheStatsButton = document.getElementById('refreshCacheStats') as HTMLButtonElement;
 const clearCacheButton = document.getElementById('clearCache') as HTMLButtonElement;
-const toastAlert = document.getElementById('toastAlert') as HTMLDivElement;
-const toastText = document.getElementById('toastText') as HTMLSpanElement;
 
-let autoSaveTimeout: number | null = null;
 let chromeBuiltinAvailable = false;
 let languageDetectorAvailable = false;
+
+const autoSave = createAutoSaver((error) => {
+  console.error('[Popup] Failed to save settings:', error);
+  showToast(t('status_saveFailed'), 'error');
+});
 
 // Apply i18n to static elements
 applyI18n();
@@ -72,33 +76,6 @@ tabs.forEach((tab) => {
   });
 });
 
-// Show toast message
-function showToast(message: string, type: 'success' | 'error' | 'info' = 'success') {
-  toastAlert.className = `alert alert-${type} shadow-lg py-2 px-3`;
-  toastText.textContent = message;
-  toastAlert.classList.remove('hidden');
-
-  setTimeout(() => {
-    toastAlert.classList.add('hidden');
-  }, 2000);
-}
-
-// Auto-save function with debounce
-async function autoSave(updates: any) {
-  if (autoSaveTimeout) {
-    clearTimeout(autoSaveTimeout);
-  }
-
-  autoSaveTimeout = window.setTimeout(async () => {
-    try {
-      await updateSettings(updates);
-    } catch (error) {
-      console.error('[Popup] Failed to save settings:', error);
-      showToast(t('status_saveFailed'), 'error');
-    }
-  }, 500);
-}
-
 // Update provider-specific API section visibility
 function updateApiSectionVisibility(provider: string) {
   googleApiKeySection.classList.toggle('hidden', provider !== 'google');
@@ -113,7 +90,8 @@ async function checkChromeBuiltinAvailability(): Promise<void> {
     'option[value="chrome-builtin"]'
   ) as HTMLOptionElement;
 
-  if (ChromeBuiltinTranslator.isAvailable()) {
+  const { supported } = await getTranslatorApiStatus();
+  if (supported) {
     chromeBuiltinAvailable = true;
     chromeBuiltinOption.disabled = false;
     chromeBuiltinOption.textContent = t('options_chromeBuiltinFree');
@@ -128,14 +106,12 @@ async function checkChromeBuiltinAvailability(): Promise<void> {
 
 // Check Chrome Language Detector API availability
 async function checkLanguageDetectorAvailability(): Promise<void> {
-  if (ChromeLanguageDetector.isAvailable()) {
-    const status = await ChromeLanguageDetector.checkAvailability();
-    if (status !== 'unavailable') {
-      languageDetectorAvailable = true;
-      skipTargetLanguageToggle.disabled = false;
-      languageDetectorHint.style.display = 'none';
-      return;
-    }
+  const status = await getLanguageDetectorStatus();
+  if (status !== 'unavailable') {
+    languageDetectorAvailable = true;
+    skipTargetLanguageToggle.disabled = false;
+    languageDetectorHint.style.display = 'none';
+    return;
   }
 
   languageDetectorAvailable = false;
@@ -187,33 +163,16 @@ function updateCacheTTLDisplay(days: number) {
   cacheTTLValue.textContent = t(key, [days.toString()]);
 }
 
-// Format bytes
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B';
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
-}
-
 // Load cache statistics
 async function loadCacheStats() {
   try {
-    const storage = await createStorage();
-    const stats = await storage.getStats();
-
-    cacheUsageProgress.value = stats.usagePercent;
-    cacheUsageText.textContent = `${stats.usagePercent}%`;
-    cacheBytesUsed.textContent = formatBytes(stats.bytesInUse);
-    cacheEntryCount.textContent = stats.entryCount.toString();
-    cacheExpiredCount.textContent = stats.expiredCount.toString();
-
-    if (stats.usagePercent >= 80) {
-      cacheUsageProgress.className = 'progress progress-error w-full h-2';
-    } else if (stats.usagePercent >= 60) {
-      cacheUsageProgress.className = 'progress progress-warning w-full h-2';
-    } else {
-      cacheUsageProgress.className = 'progress progress-primary w-full h-2';
-    }
+    await renderCacheStats({
+      progress: cacheUsageProgress,
+      usageText: cacheUsageText,
+      bytesUsed: cacheBytesUsed,
+      entryCount: cacheEntryCount,
+      expiredCount: cacheExpiredCount,
+    });
   } catch (error) {
     console.error('[Popup] Failed to load cache stats:', error);
     cacheUsageText.textContent = 'Error';

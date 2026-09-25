@@ -1,6 +1,6 @@
 /// <reference types="@types/dom-chromium-ai" />
 
-type AvailabilityStatus = 'unavailable' | 'downloadable' | 'downloading' | 'available';
+export type AvailabilityStatus = 'unavailable' | 'downloadable' | 'downloading' | 'available';
 
 /**
  * Chrome Built-in Translator API client
