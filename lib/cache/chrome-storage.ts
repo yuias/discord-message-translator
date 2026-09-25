@@ -1,5 +1,5 @@
-import { ITranslationStorage } from './types';
-import { TranslationCacheEntry } from '@/types/cache';
+import type { ITranslationStorage } from './types';
+import type { TranslationCacheEntry } from '@/types/cache';
 
 const CACHE_PREFIX = 'cache_';
 const MAX_STORAGE_BYTES = 10 * 1024 * 1024; // 10MB

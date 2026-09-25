@@ -1,4 +1,4 @@
-import { ITranslationStorage } from './types';
+import type { ITranslationStorage } from './types';
 import { ChromeStorageCache } from './chrome-storage';
 
 export async function createStorage(): Promise<ITranslationStorage> {

@@ -4,6 +4,13 @@ import { GoogleTranslateClient } from './google-translate';
 // Mock fetch
 global.fetch = vi.fn();
 
+// noUncheckedIndexedAccess makes mock.calls[0] possibly undefined; this narrows it.
+function firstCall<T extends unknown[]>(calls: T[]): T {
+  const c = calls[0];
+  if (!c) throw new Error('expected a call');
+  return c;
+}
+
 describe('GoogleTranslateClient', () => {
   let client: GoogleTranslateClient;
   // Use API key from environment variable or fallback to mock key for unit tests
@@ -60,7 +67,7 @@ describe('GoogleTranslateClient', () => {
 
       await client.translate('Hello', 'ja', 'en');
 
-      const callArgs = vi.mocked(fetch).mock.calls[0];
+      const callArgs = firstCall(vi.mocked(fetch).mock.calls);
       const body = JSON.parse(callArgs[1]?.body as string);
       expect(body.source).toBe('en');
     });
@@ -99,7 +106,7 @@ describe('GoogleTranslateClient', () => {
 
       await client.translate('Hello', 'es');
 
-      const callArgs = vi.mocked(fetch).mock.calls[0];
+      const callArgs = firstCall(vi.mocked(fetch).mock.calls);
       expect(callArgs[0]).toContain(`key=${apiKey}`);
     });
   });
@@ -150,7 +157,7 @@ describe('GoogleTranslateClient', () => {
 
       await client.translateBatch(['Hello', 'Goodbye'], 'es');
 
-      const callArgs = vi.mocked(fetch).mock.calls[0];
+      const callArgs = firstCall(vi.mocked(fetch).mock.calls);
       const body = JSON.parse(callArgs[1]?.body as string);
       expect(body.q).toEqual(['Hello', 'Goodbye']);
     });

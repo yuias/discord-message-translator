@@ -50,7 +50,7 @@ export class ChromeBuiltinTranslator {
       'zh-CN': 'zh',
       'zh-TW': 'zh-Hant',
     };
-    return mapping[code] || code.split('-')[0];
+    return mapping[code] ?? code.split('-')[0] ?? code;
   }
 
   /**

@@ -1,9 +1,9 @@
 import { getSettings } from '@/lib/utils/settings';
 import { translateMessage, translateMessageBatch } from '@/lib/utils/translator';
-import { isDiscordMessage, createDiscordMessage, findTranslatableElements, findAllTranslatableElements, TranslatableElement } from './message-utils';
+import { isDiscordMessage, createDiscordMessage, findTranslatableElements, findAllTranslatableElements, type TranslatableElement } from './message-utils';
 import { RequestQueue, debounce } from '@/lib/utils/async-control';
 import { ChromeLanguageDetector } from '@/lib/api/chrome-language-detector';
-import { extractBlocks, assembleTranslation, StructuredBlock } from '@/lib/utils/structure-preserving';
+import { extractBlocks, assembleTranslation, type StructuredBlock } from '@/lib/utils/structure-preserving';
 
 /**
  * Generate a unique key for tracking translated elements
@@ -318,8 +318,7 @@ export class MessageTranslationObserver {
       element: HTMLElement;
       elementKey: string;
       parentMessageId: string;
-      blocks: StructuredBlock[];
-      blockIds: string[];
+      entries: Array<{ block: StructuredBlock; id: string }>;
     };
     const plans: Array<SimplePlan | StructuredPlan> = [];
 
@@ -381,7 +380,7 @@ export class MessageTranslationObserver {
         if (plan.kind === 'simple') {
           pushUnique(plan.contentId, plan.content);
         } else {
-          plan.blocks.forEach((b, i) => pushUnique(plan.blockIds[i], b.text));
+          plan.entries.forEach(({ id, block }) => pushUnique(id, block.text));
         }
       }
 
@@ -405,9 +404,9 @@ export class MessageTranslationObserver {
           this.translatedElements.add(plan.elementKey);
           translatedParentIds.add(plan.parentMessageId);
         } else {
-          const translatedBlocks = plan.blocks.map((b, i) => ({
-            block: b,
-            translation: translations.get(plan.blockIds[i]) ?? b.text,
+          const translatedBlocks = plan.entries.map(({ block, id }) => ({
+            block,
+            translation: translations.get(id) ?? block.text,
           }));
           this.injectStructuredTranslationToElement(
             plan.element,
@@ -446,7 +445,7 @@ export class MessageTranslationObserver {
     fallbackText: string
   ):
     | { kind: 'simple'; contentId: string; content: string; element: HTMLElement; elementKey: string; parentMessageId: string; type: 'message-content' | 'embed-section' }
-    | { kind: 'structured'; element: HTMLElement; elementKey: string; parentMessageId: string; blocks: StructuredBlock[]; blockIds: string[] }
+    | { kind: 'structured'; element: HTMLElement; elementKey: string; parentMessageId: string; entries: Array<{ block: StructuredBlock; id: string }> }
     | null {
     const isReplyContext = item.element.closest('[id^="message-reply-context-"]') !== null;
 
@@ -455,14 +454,13 @@ export class MessageTranslationObserver {
       const hasStructure =
         blocks.length > 1 || blocks.some((b) => b.tagName !== 'p');
       if (hasStructure && blocks.length > 0) {
-        const blockIds = blocks.map((_, i) => `${item.id}-b${i}`);
+        const entries = blocks.map((block, i) => ({ block, id: `${item.id}-b${i}` }));
         return {
           kind: 'structured',
           element: item.element,
           elementKey,
           parentMessageId,
-          blocks,
-          blockIds,
+          entries,
         };
       }
     }
@@ -547,12 +545,12 @@ export class MessageTranslationObserver {
           }
         } else {
           const blockTranslations = await translateMessageBatch(
-            plan.blocks.map((b, i) => ({ id: plan.blockIds[i], content: b.text })),
+            plan.entries.map(({ id, block }) => ({ id, content: block.text })),
             settings.targetLanguage
           );
-          const translatedBlocks = plan.blocks.map((b, i) => ({
-            block: b,
-            translation: blockTranslations.get(plan.blockIds[i]) ?? b.text,
+          const translatedBlocks = plan.entries.map(({ block, id }) => ({
+            block,
+            translation: blockTranslations.get(id) ?? block.text,
           }));
           this.injectStructuredTranslationToElement(
             plan.element,

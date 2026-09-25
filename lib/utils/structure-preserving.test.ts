@@ -1,6 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { extractBlocks, assembleTranslation } from './structure-preserving';
 
+// noUncheckedIndexedAccess makes array/NodeList access possibly undefined; this narrows it.
+function at<T>(arr: ArrayLike<T>, index: number): T {
+  const v = arr[index];
+  if (v === undefined) throw new Error(`expected index ${index}`);
+  return v;
+}
+
 function makeMessageContent(innerHTML: string): HTMLElement {
   const el = document.createElement('div');
   el.id = 'message-content-1';
@@ -14,17 +21,17 @@ describe('extractBlocks', () => {
     const el = makeMessageContent('<span>Hello world</span>');
     const blocks = extractBlocks(el);
     expect(blocks).toHaveLength(1);
-    expect(blocks[0].tagName).toBe('p');
-    expect(blocks[0].text).toBe('Hello world');
-    expect(blocks[0].placeholders).toHaveLength(0);
+    expect(at(blocks, 0).tagName).toBe('p');
+    expect(at(blocks, 0).text).toBe('Hello world');
+    expect(at(blocks, 0).placeholders).toHaveLength(0);
   });
 
   it('splits paragraphs on blank lines', () => {
     const el = makeMessageContent('<span>First line\n\nSecond line</span>');
     const blocks = extractBlocks(el);
     expect(blocks).toHaveLength(2);
-    expect(blocks[0].text).toBe('First line');
-    expect(blocks[1].text).toBe('Second line');
+    expect(at(blocks, 0).text).toBe('First line');
+    expect(at(blocks, 1).text).toBe('Second line');
   });
 
   it('extracts headings as their own blocks', () => {
@@ -50,9 +57,9 @@ describe('extractBlocks', () => {
     );
     const blocks = extractBlocks(el);
     expect(blocks).toHaveLength(1);
-    expect(blocks[0].text).toBe('§M0§ hello');
-    expect(blocks[0].placeholders).toHaveLength(1);
-    expect(blocks[0].placeholders[0].token).toBe('§M0§');
+    expect(at(blocks, 0).text).toBe('§M0§ hello');
+    expect(at(blocks, 0).placeholders).toHaveLength(1);
+    expect(at(at(blocks, 0).placeholders, 0).token).toBe('§M0§');
   });
 
   it('substitutes channel mentions with channel tokens', () => {
@@ -60,8 +67,8 @@ describe('extractBlocks', () => {
       '<span>see </span><span class="channelMention"><span>#rules</span></span>'
     );
     const blocks = extractBlocks(el);
-    expect(blocks[0].text).toBe('see §C0§');
-    expect(blocks[0].placeholders[0].token).toBe('§C0§');
+    expect(at(blocks, 0).text).toBe('see §C0§');
+    expect(at(at(blocks, 0).placeholders, 0).token).toBe('§C0§');
   });
 
   it('drops hiddenVisually nodes used for screen readers', () => {
@@ -69,7 +76,7 @@ describe('extractBlocks', () => {
       '<h1><span>Title</span><span class="hiddenVisually_xyz">, </span></h1>'
     );
     const blocks = extractBlocks(el);
-    expect(blocks[0].text).toBe('Title');
+    expect(at(blocks, 0).text).toBe('Title');
   });
 
   it('handles a mixed structure like the real Discord example', () => {
@@ -85,8 +92,8 @@ describe('extractBlocks', () => {
     const blocks = extractBlocks(el);
     const tags = blocks.map((b) => b.tagName);
     expect(tags).toEqual(['p', 'h1', 'li']);
-    expect(blocks[0].placeholders[0].token).toBe('§M0§');
-    expect(blocks[2].placeholders[0].token).toBe('§C0§');
+    expect(at(at(blocks, 0).placeholders, 0).token).toBe('§M0§');
+    expect(at(at(blocks, 2).placeholders, 0).token).toBe('§C0§');
   });
 
   it('transparently unwraps an existing .discord-translator-original wrapper', () => {
@@ -120,7 +127,7 @@ describe('assembleTranslation', () => {
     ]);
     expect(container.querySelectorAll('ul')).toHaveLength(1);
     expect(container.querySelectorAll('li')).toHaveLength(2);
-    expect(container.querySelectorAll('li')[0].textContent).toBe('一');
+    expect(at(container.querySelectorAll('li'), 0).textContent).toBe('一');
   });
 
   it('starts a new list when listContext changes', () => {

@@ -4,6 +4,13 @@ import { OpenAICompatibleClient } from './openai-compatible';
 // Mock fetch
 global.fetch = vi.fn();
 
+// noUncheckedIndexedAccess makes mock.calls[0] possibly undefined; this narrows it.
+function firstCall<T extends unknown[]>(calls: T[]): T {
+  const c = calls[0];
+  if (!c) throw new Error('expected a call');
+  return c;
+}
+
 describe('OpenAICompatibleClient', () => {
   let client: OpenAICompatibleClient;
   const apiKey = process.env.OPENAI_API_KEY || 'test-openai-key';
@@ -63,7 +70,7 @@ describe('OpenAICompatibleClient', () => {
 
       await client.translate('Hello', 'ja');
 
-      const callArgs = vi.mocked(fetch).mock.calls[0];
+      const callArgs = firstCall(vi.mocked(fetch).mock.calls);
       const body = JSON.parse(callArgs[1]?.body as string);
       expect(body.model).toBe(model);
     });
@@ -80,7 +87,7 @@ describe('OpenAICompatibleClient', () => {
 
       await client.translate('Hello', 'es');
 
-      const callArgs = vi.mocked(fetch).mock.calls[0];
+      const callArgs = firstCall(vi.mocked(fetch).mock.calls);
       const body = JSON.parse(callArgs[1]?.body as string);
 
       expect(body.messages).toHaveLength(2);
@@ -102,7 +109,7 @@ describe('OpenAICompatibleClient', () => {
 
       await client.translate('Hello', 'de');
 
-      const callArgs = vi.mocked(fetch).mock.calls[0];
+      const callArgs = firstCall(vi.mocked(fetch).mock.calls);
       const body = JSON.parse(callArgs[1]?.body as string);
       expect(body.temperature).toBe(0.3);
     });
@@ -176,7 +183,7 @@ describe('OpenAICompatibleClient', () => {
 
       await client.translate('Hello', 'zh-CN');
 
-      const callArgs = vi.mocked(fetch).mock.calls[0];
+      const callArgs = firstCall(vi.mocked(fetch).mock.calls);
       const body = JSON.parse(callArgs[1]?.body as string);
       expect(body.messages[0].content).toContain('Simplified Chinese');
     });
@@ -275,7 +282,7 @@ describe('OpenAICompatibleClient', () => {
 
       await client.translateBatch(['Hello', 'Goodbye'], 'es');
 
-      const callArgs = vi.mocked(fetch).mock.calls[0];
+      const callArgs = firstCall(vi.mocked(fetch).mock.calls);
       const body = JSON.parse(callArgs[1]?.body as string);
       expect(body.messages[1].content).toContain('[1] Hello');
       expect(body.messages[1].content).toContain('[2] Goodbye');

@@ -1,6 +1,6 @@
 import { createStorage } from '@/lib/cache/factory';
 import { createTranslationClient } from '@/lib/api/factory';
-import { TranslationCacheEntry } from '@/types/cache';
+import type { TranslationCacheEntry } from '@/types/cache';
 import { getSettings } from './settings';
 
 export async function translateMessage(
@@ -12,9 +12,10 @@ export async function translateMessage(
 
   // Check cache
   const cached = await storage.get(messageId);
-  if (cached?.translations[targetLang]) {
+  const hit = cached?.translations[targetLang];
+  if (hit) {
     console.log(`[Translator] Cache hit for message ${messageId}`);
-    return cached.translations[targetLang];
+    return hit;
   }
 
   // Get settings and create client
@@ -56,8 +57,9 @@ export async function translateMessageBatch(
 
   for (const message of messages) {
     const cached = await storage.get(message.id);
-    if (cached?.translations[targetLang]) {
-      results.set(message.id, cached.translations[targetLang]);
+    const hit = cached?.translations[targetLang];
+    if (hit) {
+      results.set(message.id, hit);
       console.log(`[Translator] Cache hit for message ${message.id}`);
     } else {
       uncachedMessages.push(message);
@@ -81,10 +83,15 @@ export async function translateMessageBatch(
     throw error;
   }
 
+  if (translations.length !== uncachedMessages.length) {
+    throw new Error('[Translator] translateBatch returned a mismatched number of results');
+  }
+
   // Save translations to cache and results
   for (let i = 0; i < uncachedMessages.length; i++) {
     const message = uncachedMessages[i];
     const translation = translations[i];
+    if (message === undefined || translation === undefined) continue;
 
     results.set(message.id, translation);
 

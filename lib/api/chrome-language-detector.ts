@@ -115,6 +115,7 @@ export class ChromeLanguageDetector {
     }
 
     const primary = results[0];
+    if (!primary) return null;
     if (primary.confidence >= minConfidence) {
       return primary.detectedLanguage;
     }
@@ -140,9 +141,10 @@ export class ChromeLanguageDetector {
     }
 
     const primary = results[0];
+    if (!primary) return false;
     // Normalize language codes for comparison (e.g., "ja" matches "ja", "en" matches "en-US")
-    const normalizedDetected = primary.detectedLanguage.split('-')[0].toLowerCase();
-    const normalizedExpected = languageCode.split('-')[0].toLowerCase();
+    const normalizedDetected = (primary.detectedLanguage.split('-')[0] ?? primary.detectedLanguage).toLowerCase();
+    const normalizedExpected = (languageCode.split('-')[0] ?? languageCode).toLowerCase();
 
     return normalizedDetected === normalizedExpected && primary.confidence >= minConfidence;
   }

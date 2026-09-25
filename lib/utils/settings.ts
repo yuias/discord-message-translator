@@ -1,4 +1,4 @@
-import { Settings, DEFAULT_SETTINGS } from '@/types/settings';
+import { DEFAULT_SETTINGS, type Settings } from '@/types/settings';
 
 export async function getSettings(): Promise<Settings> {
   const result = await chrome.storage.sync.get(null);

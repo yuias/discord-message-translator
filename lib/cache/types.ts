@@ -1,4 +1,4 @@
-import { TranslationCacheEntry } from '@/types/cache';
+import type { TranslationCacheEntry } from '@/types/cache';
 
 /**
  * Cache statistics information

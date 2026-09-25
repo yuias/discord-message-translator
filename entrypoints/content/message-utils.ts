@@ -1,4 +1,4 @@
-import { DiscordMessage } from '@/types/message';
+import type { DiscordMessage } from '@/types/message';
 
 // Discord message content element selectors (in priority order)
 const MESSAGE_CONTENT_SELECTORS = [
@@ -129,7 +129,7 @@ export function extractMessageId(element: HTMLElement): string | null {
   // 1. Try to extract from message-content-* id (if element itself is a content element)
   if (element.id?.startsWith('message-content-')) {
     const match = element.id.match(/^message-content-(\d+)$/);
-    if (match) {
+    if (match?.[1]) {
       return match[1];
     }
   }
@@ -137,8 +137,9 @@ export function extractMessageId(element: HTMLElement): string | null {
   // 2. Try chat-messages list item id (e.g., "chat-messages-{channelId}-{messageId}")
   if (element.id?.startsWith('chat-messages-')) {
     const parts = element.id.split('-');
-    if (parts.length >= 4) {
-      return parts[parts.length - 1]; // Last part is message ID
+    const last = parts[parts.length - 1]; // Last part is message ID
+    if (parts.length >= 4 && last !== undefined) {
+      return last;
     }
   }
 
@@ -146,7 +147,7 @@ export function extractMessageId(element: HTMLElement): string | null {
   const mainContent = findMainMessageContent(element);
   if (mainContent?.id) {
     const match = mainContent.id.match(/^message-content-(\d+)$/);
-    if (match) {
+    if (match?.[1]) {
       return match[1];
     }
   }

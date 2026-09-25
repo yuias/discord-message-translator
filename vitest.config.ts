@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitest/config';
-import { resolve } from 'path';
+import { resolve } from 'node:path';
 import { loadEnv } from 'vite';
 
 export default defineConfig(({ mode }) => {
@@ -34,7 +34,7 @@ export default defineConfig(({ mode }) => {
     },
     resolve: {
       alias: {
-        '@': resolve(__dirname),
+        '@': resolve(import.meta.dirname),
       },
     },
   };
