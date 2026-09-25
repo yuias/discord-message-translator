@@ -30,14 +30,14 @@ pnpm install
 pnpm build
 ```
 
-This will create a `dist` folder with the compiled extension.
+This will create a `.output/chrome-mv3` folder with the compiled extension.
 
 ### 3. Load the Extension in Chrome
 
 1. Open Chrome and navigate to `chrome://extensions/`
 2. Enable "Developer mode" (toggle in the top right)
 3. Click "Load unpacked"
-4. Select the `dist` folder
+4. Select the `.output/chrome-mv3` folder
 
 ### 4. Configure Translation Provider
 
