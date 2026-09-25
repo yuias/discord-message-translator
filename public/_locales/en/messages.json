@@ -100,12 +100,6 @@
   "options_tabGeneral": {
     "message": "General"
   },
-  "options_tabApi": {
-    "message": "API Keys"
-  },
-  "options_tabCache": {
-    "message": "Cache"
-  },
   "options_translationMode": {
     "message": "Translation Mode"
   },
@@ -204,9 +198,6 @@
   },
   "options_cacheDuration": {
     "message": "Cache Duration"
-  },
-  "options_cacheTTL": {
-    "message": "Cache TTL (days)"
   },
   "options_cacheTTLDefault": {
     "message": "Default: 7 days"

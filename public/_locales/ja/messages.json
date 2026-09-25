@@ -100,12 +100,6 @@
   "options_tabGeneral": {
     "message": "一般"
   },
-  "options_tabApi": {
-    "message": "APIキー"
-  },
-  "options_tabCache": {
-    "message": "キャッシュ"
-  },
   "options_translationMode": {
     "message": "翻訳モード"
   },
@@ -204,9 +198,6 @@
   },
   "options_cacheDuration": {
     "message": "キャッシュ期間"
-  },
-  "options_cacheTTL": {
-    "message": "キャッシュ有効期限（日数）"
   },
   "options_cacheTTLDefault": {
     "message": "デフォルト: 7日"

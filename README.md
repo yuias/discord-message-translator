@@ -41,9 +41,8 @@ This will create a `dist` folder with the compiled extension.
 
 ### 4. Configure Translation Provider
 
-1. Click the extension icon in Chrome
-2. Open the **API** tab
-3. Select your preferred translation provider:
+1. Click the extension icon in Chrome, then click **Open settings** (or right-click the extension icon → **Options**)
+2. In the **Translation Provider** section, select your preferred provider:
    - **Google Translate**: Get an API key from [Google Cloud Translation API](https://cloud.google.com/translate/docs)
    - **DeepL**: Get an API key from [DeepL API](https://www.deepl.com/pro-api)
    - **OpenAI-compatible API**: Configure with any OpenAI-compatible endpoint
@@ -51,7 +50,7 @@ This will create a `dist` folder with the compiled extension.
      - Anthropic Claude (via compatible endpoints)
      - Google Gemini (via compatible endpoints)
      - Other OpenAI-compatible services
-4. Enter your API key and configure provider-specific settings (auto-saved)
+3. Enter your API key and configure provider-specific settings (auto-saved)
 
 For OpenAI-compatible APIs, you'll need to configure:
 - **Base URL**: API endpoint (e.g., `https://api.openai.com/v1`)
@@ -100,7 +99,8 @@ discord-message-translator/
 │   ├── entrypoints/
 │   │   ├── background.ts    # Service Worker
 │   │   ├── content/         # Content Script (injected into Discord)
-│   │   └── popup/           # Popup UI (includes all settings)
+│   │   ├── popup/           # Popup UI (quick toggles only)
+│   │   └── options/         # Options page (opens in its own tab)
 │   ├── lib/
 │   │   ├── api/              # Translation API clients
 │   │   ├── cache/            # Cache implementation
@@ -124,14 +124,22 @@ discord-message-translator/
 
 ### Settings
 
-- **Translation Provider**: Choose between Google Translate, DeepL, OpenAI-compatible APIs, or Chrome Built-in Translator
-- **API Configuration**: Configure API keys and provider-specific settings
-- **Target Language**: Choose which language to translate to
+Settings are split between the popup (quick toggles for everyday use) and the
+options page (detailed configuration). Open the options page from the popup's
+**Open settings** button, or by right-clicking the extension icon and choosing
+**Options**.
+
+**Popup**
 - **Auto Translate**: Enable/disable automatic translation of messages
+- **Target Language**: Choose which language to translate to
 - **Translation Mode**:
   - **Replace Original**: Replace the original message with translation
   - **Show Both**: Display both original and translated text
-- **Skip Target Language**: Automatically skip translation for messages already in the target language (requires Chrome's Language Detector API)
+
+**Options page**
+- **Translation Provider**: Choose between Google Translate, DeepL, OpenAI-compatible APIs, or Chrome Built-in Translator
+- **API Configuration**: Configure API keys and provider-specific settings
+- **Language Detection**: An API status panel plus **Skip Target Language**, which automatically skips translation for messages already in the target language (requires Chrome's Language Detector API)
 - **Cache Settings**:
   - **Cache TTL**: How long to keep translations cached (default: 7 days)
   - **Cache Usage**: View current cache usage and storage statistics
