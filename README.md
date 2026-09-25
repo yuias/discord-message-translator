@@ -18,14 +18,16 @@ Chrome Extension to automatically translate Discord messages with Google Transla
 
 ### 1. Install Dependencies
 
+Requires Node.js and pnpm (`corepack enable` picks up the version pinned in `package.json`).
+
 ```bash
-npm install
+pnpm install
 ```
 
 ### 2. Build the Extension
 
 ```bash
-npm run build
+pnpm build
 ```
 
 This will create a `dist` folder with the compiled extension.
@@ -79,7 +81,7 @@ VITE_OPENAI_API_KEY=your_openai_api_key
 ### Run in Development Mode
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 This will start Vite in development mode with hot reloading.
@@ -87,7 +89,7 @@ This will start Vite in development mode with hot reloading.
 ### Type Checking
 
 ```bash
-npm run type-check
+pnpm type-check
 ```
 
 ## Project Structure
