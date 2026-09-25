@@ -25,6 +25,9 @@
   "popup_modeAppend": {
     "message": "Show Both"
   },
+  "popup_openOptions": {
+    "message": "Open settings"
+  },
 
   "status_autoTranslateEnabled": {
     "message": "Auto translate enabled"
@@ -66,6 +69,33 @@
 
   "options_subtitle": {
     "message": "Configure your translation preferences"
+  },
+  "options_title": {
+    "message": "Settings"
+  },
+  "options_sectionLanguageDetection": {
+    "message": "Language Detection"
+  },
+  "options_apiStatus": {
+    "message": "API status"
+  },
+  "options_apiStatusTranslator": {
+    "message": "Translator API"
+  },
+  "options_apiStatusLanguageDetector": {
+    "message": "Language Detector API"
+  },
+  "options_statusAvailable": {
+    "message": "Available"
+  },
+  "options_statusDownloadable": {
+    "message": "Downloadable"
+  },
+  "options_statusDownloading": {
+    "message": "Downloading"
+  },
+  "options_statusUnavailable": {
+    "message": "Unavailable"
   },
   "options_tabGeneral": {
     "message": "General"

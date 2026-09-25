@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="manifest.open_in_tab" content="true" />
+  <title>Discord Message Translator - Settings</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body class="min-h-screen bg-base-200 py-8 px-4">
+  <div class="max-w-2xl mx-auto space-y-4">
+    <!-- Header -->
+    <div>
+      <h1 class="text-2xl font-bold" data-i18n="options_title">Settings</h1>
+      <p class="text-sm text-base-content/60" data-i18n="options_subtitle">Configure your translation preferences</p>
+    </div>
+
+    <!-- General -->
+    <div class="card bg-base-100 shadow-sm">
+      <div class="card-body space-y-3">
+        <h2 class="card-title text-base" data-i18n="options_tabGeneral">General</h2>
+
+        <label class="label cursor-pointer justify-start gap-3 py-1">
+          <input type="checkbox" id="autoTranslate" class="toggle toggle-primary toggle-sm" checked />
+          <div>
+            <span class="text-sm" data-i18n="options_enableAutoTranslate">Enable automatic translation</span>
+            <p class="text-xs text-base-content/60" data-i18n="options_autoTranslateDesc">Automatically translate messages as they appear</p>
+          </div>
+        </label>
+
+        <div class="flex flex-col w-full">
+          <label class="label py-1">
+            <span class="text-sm" data-i18n="options_targetLanguage">Target Language</span>
+          </label>
+          <select id="targetLanguage" class="select select-sm w-full"></select>
+        </div>
+
+        <div class="flex flex-col w-full">
+          <label class="label py-1">
+            <span class="text-sm" data-i18n="options_translationMode">Translation Mode</span>
+          </label>
+          <select id="translationMode" class="select select-sm w-full">
+            <option value="replace" data-i18n="common_modeReplace">Replace Original</option>
+            <option value="append" data-i18n="options_modeAppend">Show Both (Original + Translation)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Translation Provider -->
+    <div class="card bg-base-100 shadow-sm">
+      <div class="card-body space-y-3">
+        <h2 class="card-title text-base" data-i18n="options_translationProvider">Translation Provider</h2>
+
+        <div class="flex flex-col w-full">
+          <label class="label py-1">
+            <span class="text-sm" data-i18n="options_selectProvider">Select Provider</span>
+          </label>
+          <select id="translationProvider" class="select select-sm w-full">
+            <option value="chrome-builtin" disabled data-i18n="options_chromeBuiltinChecking">Chrome Built-in (Checking...)</option>
+            <option value="google" data-i18n="options_providerGoogle">Google Translate</option>
+            <option value="deepl" data-i18n="options_providerDeepl">DeepL</option>
+            <option value="openai" data-i18n="options_providerOpenai">OpenAI Compatible</option>
+          </select>
+          <label class="label py-0" id="chromeBuiltinHint" style="display: none;">
+            <span class="text-warning text-xs" data-i18n="options_chromeBuiltinHint">Chrome Built-in requires Chrome 138+ with Translator API enabled</span>
+          </label>
+        </div>
+
+        <!-- Google API Key -->
+        <div id="googleApiKeySection" class="space-y-1 hidden">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium" data-i18n="options_googleTranslateApi">Google Translate API</span>
+            <a href="https://cloud.google.com/translate/docs" target="_blank" class="link link-primary text-xs" data-i18n="options_getApiKey">Get API Key</a>
+          </div>
+          <div class="relative">
+            <input type="password" id="googleApiKey" data-i18n-placeholder="options_googleApiKeyPlaceholder" placeholder="Enter your Google API key" class="input input-sm w-full pr-10" />
+            <button type="button" id="toggleGoogleApiKeyVisibility" class="btn btn-xs btn-ghost absolute right-1 top-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </button>
+          </div>
+          <p class="text-xs text-base-content/60" data-i18n="options_apiKeyLocalNote">Your API key is stored locally and never shared</p>
+        </div>
+
+        <!-- DeepL API Key -->
+        <div id="deeplApiKeySection" class="space-y-1 hidden">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium" data-i18n="options_deeplApi">DeepL API</span>
+            <a href="https://www.deepl.com/pro-api" target="_blank" class="link link-primary text-xs" data-i18n="options_getApiKey">Get API Key</a>
+          </div>
+          <div class="relative">
+            <input type="password" id="deeplApiKey" data-i18n-placeholder="options_deeplApiKeyPlaceholder" placeholder="Enter your DeepL API key" class="input input-sm w-full pr-10" />
+            <button type="button" id="toggleDeeplApiKeyVisibility" class="btn btn-xs btn-ghost absolute right-1 top-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </button>
+          </div>
+          <p class="text-xs text-base-content/60" data-i18n="options_deeplAccountNote">Supports both free and paid accounts</p>
+          <p class="text-xs text-base-content/60" data-i18n="options_apiKeyLocalNote">Your API key is stored locally and never shared</p>
+        </div>
+
+        <!-- OpenAI Section -->
+        <div id="openaiApiSection" class="space-y-2 hidden">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium" data-i18n="options_openaiCompatibleApi">OpenAI Compatible API</span>
+            <a href="https://platform.openai.com/api-keys" target="_blank" class="link link-primary text-xs" data-i18n="options_getApiKey">Get API Key</a>
+          </div>
+          <div class="relative">
+            <input type="password" id="openaiApiKey" data-i18n-placeholder="options_openaiApiKeyPlaceholder" placeholder="Enter your API key" class="input input-sm w-full pr-10" />
+            <button type="button" id="toggleOpenaiApiKeyVisibility" class="btn btn-xs btn-ghost absolute right-1 top-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </button>
+          </div>
+          <p class="text-xs text-base-content/60" data-i18n="options_apiKeyLocalNote">Your API key is stored locally and never shared</p>
+          <div class="flex flex-col w-full">
+            <label class="label py-0">
+              <span class="text-xs" data-i18n="options_baseUrl">Base URL</span>
+            </label>
+            <input type="text" id="openaiBaseUrl" placeholder="https://api.openai.com/v1" class="input input-sm w-full" />
+            <p class="text-xs text-base-content/60" data-i18n="options_baseUrlHint">e.g., https://api.openai.com/v1 or custom endpoint</p>
+          </div>
+          <div class="flex flex-col w-full">
+            <label class="label py-0">
+              <span class="text-xs" data-i18n="options_model">Model</span>
+            </label>
+            <input type="text" id="openaiModel" placeholder="gpt-4" class="input input-sm w-full" />
+            <p class="text-xs text-base-content/60" data-i18n="options_modelHint">e.g., gpt-4, gpt-3.5-turbo, claude-3-5-sonnet-20241022</p>
+          </div>
+        </div>
+
+        <!-- Chrome Built-in message -->
+        <div id="chromeBuiltinSection" class="hidden">
+          <div class="alert alert-info py-2 text-xs">
+            <span data-i18n="options_chromeBuiltinFree">Chrome Built-in Translator (Free)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Language Detection -->
+    <div class="card bg-base-100 shadow-sm">
+      <div class="card-body space-y-3">
+        <h2 class="card-title text-base" data-i18n="options_sectionLanguageDetection">Language Detection</h2>
+
+        <div class="flex flex-col">
+          <label class="label cursor-pointer justify-start gap-3 py-1">
+            <input type="checkbox" id="skipTargetLanguage" class="toggle toggle-secondary toggle-sm" disabled />
+            <div>
+              <span class="text-sm" data-i18n="options_skipTargetLanguage">Skip messages already in target language</span>
+              <p class="text-xs text-base-content/60" data-i18n="options_skipTargetLanguageDesc">Uses Chrome Language Detection API to detect message language</p>
+            </div>
+          </label>
+          <label class="label py-0" id="languageDetectorHint" style="display: none;">
+            <span class="text-warning text-xs" data-i18n="options_skipTargetLanguageHint">Requires Chrome 138+ with Language Detection API enabled</span>
+          </label>
+        </div>
+
+        <!-- Chrome built-in API status panel -->
+        <div class="bg-base-200 rounded-lg p-3 space-y-1">
+          <div class="text-sm font-medium" data-i18n="options_apiStatus">API status</div>
+          <div class="flex items-center justify-between text-xs">
+            <span data-i18n="options_apiStatusTranslator">Translator API</span>
+            <span id="translatorApiStatus" class="badge badge-sm"></span>
+          </div>
+          <div class="flex items-center justify-between text-xs">
+            <span data-i18n="options_apiStatusLanguageDetector">Language Detector API</span>
+            <span id="languageDetectorApiStatus" class="badge badge-sm"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cache -->
+    <div class="card bg-base-100 shadow-sm">
+      <div class="card-body space-y-3">
+        <h2 class="card-title text-base" data-i18n="options_cacheManagement">Cache Management</h2>
+        <p class="text-xs text-base-content/60" data-i18n="options_cacheInfoNote">Cached translations reduce API costs and improve performance</p>
+
+        <div class="flex flex-col w-full">
+          <label class="label py-1">
+            <span class="text-sm" data-i18n="options_cacheDuration">Cache Duration</span>
+            <span class="text-xs" id="cacheTTLValue">7 days</span>
+          </label>
+          <input type="range" id="cacheTTLDays" min="1" max="30" value="7" class="range range-primary range-sm" step="1" />
+          <div class="w-full flex justify-between text-xs px-1 mt-1 text-base-content/50">
+            <span>1</span>
+            <span>30</span>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="text-sm font-medium" data-i18n="options_storageUsage">Storage Usage</span>
+            <span class="text-xs font-bold" id="cacheUsageText" data-i18n="options_loading">Loading...</span>
+          </div>
+          <progress id="cacheUsageProgress" class="progress progress-primary w-full h-2" value="0" max="100"></progress>
+          <div class="flex justify-between text-xs text-base-content/50">
+            <span id="cacheBytesUsed">0 KB</span>
+            <span>10 MB</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div class="bg-base-200 rounded-lg p-2 text-center">
+              <div class="text-xs text-base-content/60" data-i18n="options_cachedEntries">Cached</div>
+              <div class="text-lg font-bold" id="cacheEntryCount">0</div>
+            </div>
+            <div class="bg-base-200 rounded-lg p-2 text-center">
+              <div class="text-xs text-base-content/60" data-i18n="options_expiredEntries">Expired</div>
+              <div class="text-lg font-bold" id="cacheExpiredCount">0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <button id="refreshCacheStats" class="btn btn-outline btn-sm flex-1" data-i18n="options_refreshStats">Refresh</button>
+          <button id="clearCache" class="btn btn-warning btn-sm flex-1" data-i18n="options_clearAllCache">Clear Cache</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Message -->
+  <div id="toast" class="toast toast-top toast-end z-50">
+    <div id="toastAlert" class="alert alert-success shadow-lg hidden py-2 px-3">
+      <span id="toastText" class="text-sm"></span>
+    </div>
+  </div>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

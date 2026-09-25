@@ -25,6 +25,9 @@
   "popup_modeAppend": {
     "message": "両方表示"
   },
+  "popup_openOptions": {
+    "message": "設定を開く"
+  },
 
   "status_autoTranslateEnabled": {
     "message": "自動翻訳を有効にしました"
@@ -66,6 +69,33 @@
 
   "options_subtitle": {
     "message": "翻訳の設定を行います"
+  },
+  "options_title": {
+    "message": "設定"
+  },
+  "options_sectionLanguageDetection": {
+    "message": "言語検出"
+  },
+  "options_apiStatus": {
+    "message": "APIステータス"
+  },
+  "options_apiStatusTranslator": {
+    "message": "Translator API"
+  },
+  "options_apiStatusLanguageDetector": {
+    "message": "Language Detector API"
+  },
+  "options_statusAvailable": {
+    "message": "利用可能"
+  },
+  "options_statusDownloadable": {
+    "message": "ダウンロード可能"
+  },
+  "options_statusDownloading": {
+    "message": "ダウンロード中"
+  },
+  "options_statusUnavailable": {
+    "message": "利用不可"
   },
   "options_tabGeneral": {
     "message": "一般"
