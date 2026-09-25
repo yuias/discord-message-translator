@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark;
+}
+
+body {
+  min-width: 448px;
+  font-family: system-ui, -apple-system, sans-serif;
+}

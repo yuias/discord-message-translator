@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discord Message Translator</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body class="w-[28rem] max-h-[560px] overflow-y-auto p-4">
+  <div class="space-y-3">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+      <h1 class="text-lg font-bold" data-i18n="popup_title">Discord Translator</h1>
+      <input type="checkbox" id="autoTranslate" class="toggle toggle-primary toggle-sm" checked />
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div role="tablist" class="tabs tabs-sm tabs-box">
+      <a role="tab" class="tab tab-active" data-tab="general">
+        <span data-i18n="options_tabGeneral">General</span>
+      </a>
+      <a role="tab" class="tab" data-tab="api">
+        <span data-i18n="options_tabApi">API</span>
+      </a>
+      <a role="tab" class="tab" data-tab="cache">
+        <span data-i18n="options_tabCache">Cache</span>
+      </a>
+    </div>
+
+    <!-- Tab Content -->
+    <div id="tabContent">
+      <!-- General Tab -->
+      <div class="tab-panel" data-panel="general">
+        <div class="space-y-3">
+          <!-- Target Language -->
+          <div class="flex flex-col w-full">
+            <label class="label py-1">
+              <span class="text-sm" data-i18n="popup_targetLanguage">Target Language</span>
+            </label>
+            <select id="targetLanguage" class="select select-sm w-full"></select>
+          </div>
+
+          <!-- Translation Mode -->
+          <div class="flex flex-col w-full">
+            <label class="label py-1">
+              <span class="text-sm" data-i18n="popup_translationMode">Translation Mode</span>
+            </label>
+            <select id="translationMode" class="select select-sm w-full">
+              <option value="replace" data-i18n="common_modeReplace">Replace Original</option>
+              <option value="append" data-i18n="popup_modeAppend">Show Both</option>
+            </select>
+          </div>
+
+          <!-- Skip Target Language -->
+          <div class="flex flex-col">
+            <label class="label cursor-pointer justify-start gap-3 py-1">
+              <input type="checkbox" id="skipTargetLanguage" class="toggle toggle-secondary toggle-sm" disabled />
+              <div>
+                <span class="text-sm" data-i18n="options_skipTargetLanguage">Skip messages already in target language</span>
+                <p class="text-xs text-base-content/60" id="skipTargetLanguageDesc" data-i18n="options_skipTargetLanguageDesc">Uses Chrome Language Detection API</p>
+              </div>
+            </label>
+            <label class="label py-0" id="languageDetectorHint" style="display: none;">
+              <span class="text-warning text-xs" data-i18n="options_skipTargetLanguageHint">Requires Chrome 138+ with Language Detection API enabled</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- API Tab -->
+      <div class="tab-panel hidden" data-panel="api">
+        <div class="space-y-3">
+          <!-- Translation Provider -->
+          <div class="flex flex-col w-full">
+            <label class="label py-1">
+              <span class="text-sm" data-i18n="options_selectProvider">Provider</span>
+            </label>
+            <select id="translationProvider" class="select select-sm w-full">
+              <option value="chrome-builtin" disabled data-i18n="options_chromeBuiltinChecking">Chrome Built-in (Checking...)</option>
+              <option value="google" data-i18n="options_providerGoogle">Google Translate</option>
+              <option value="deepl" data-i18n="options_providerDeepl">DeepL</option>
+              <option value="openai" data-i18n="options_providerOpenai">OpenAI Compatible</option>
+            </select>
+            <label class="label py-0" id="chromeBuiltinHint" style="display: none;">
+              <span class="text-warning text-xs" data-i18n="options_chromeBuiltinHint">Chrome Built-in requires Chrome 138+ with Translator API enabled</span>
+            </label>
+          </div>
+
+          <!-- Google API Key -->
+          <div id="googleApiKeySection" class="space-y-1 hidden">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-medium" data-i18n="options_googleTranslateApi">Google Translate API</span>
+              <a href="https://cloud.google.com/translate/docs" target="_blank" class="link link-primary text-xs" data-i18n="options_getApiKey">Get API Key</a>
+            </div>
+            <div class="relative">
+              <input type="password" id="googleApiKey" data-i18n-placeholder="options_googleApiKeyPlaceholder" placeholder="Enter your Google API key" class="input input-sm w-full pr-10" />
+              <button type="button" id="toggleGoogleApiKeyVisibility" class="btn btn-xs btn-ghost absolute right-1 top-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- DeepL API Key -->
+          <div id="deeplApiKeySection" class="space-y-1 hidden">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-medium" data-i18n="options_deeplApi">DeepL API</span>
+              <a href="https://www.deepl.com/pro-api" target="_blank" class="link link-primary text-xs" data-i18n="options_getApiKey">Get API Key</a>
+            </div>
+            <div class="relative">
+              <input type="password" id="deeplApiKey" data-i18n-placeholder="options_deeplApiKeyPlaceholder" placeholder="Enter your DeepL API key" class="input input-sm w-full pr-10" />
+              <button type="button" id="toggleDeeplApiKeyVisibility" class="btn btn-xs btn-ghost absolute right-1 top-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- OpenAI Section -->
+          <div id="openaiApiSection" class="space-y-2 hidden">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-medium" data-i18n="options_openaiCompatibleApi">OpenAI Compatible API</span>
+              <a href="https://platform.openai.com/api-keys" target="_blank" class="link link-primary text-xs" data-i18n="options_getApiKey">Get API Key</a>
+            </div>
+            <div class="relative">
+              <input type="password" id="openaiApiKey" data-i18n-placeholder="options_openaiApiKeyPlaceholder" placeholder="Enter your API key" class="input input-sm w-full pr-10" />
+              <button type="button" id="toggleOpenaiApiKeyVisibility" class="btn btn-xs btn-ghost absolute right-1 top-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </button>
+            </div>
+            <div class="flex flex-col w-full">
+              <label class="label py-0">
+                <span class="text-xs" data-i18n="options_baseUrl">Base URL</span>
+              </label>
+              <input type="text" id="openaiBaseUrl" placeholder="https://api.openai.com/v1" class="input input-sm w-full" />
+            </div>
+            <div class="flex flex-col w-full">
+              <label class="label py-0">
+                <span class="text-xs" data-i18n="options_model">Model</span>
+              </label>
+              <input type="text" id="openaiModel" placeholder="gpt-4" class="input input-sm w-full" />
+            </div>
+          </div>
+
+          <!-- Chrome Built-in message -->
+          <div id="chromeBuiltinSection" class="hidden">
+            <div class="alert alert-info py-2 text-xs">
+              <span data-i18n="options_chromeBuiltinFree">Chrome Built-in Translator (Free)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cache Tab -->
+      <div class="tab-panel hidden" data-panel="cache">
+        <div class="space-y-3">
+          <!-- Cache TTL -->
+          <div class="flex flex-col w-full">
+            <label class="label py-1">
+              <span class="text-sm" data-i18n="options_cacheTTL">Cache TTL (days)</span>
+              <span class="text-xs" id="cacheTTLValue">7 days</span>
+            </label>
+            <input type="range" id="cacheTTLDays" min="1" max="30" value="7" class="range range-primary range-sm" step="1" />
+            <div class="w-full flex justify-between text-xs px-1 mt-1 text-base-content/50">
+              <span>1</span>
+              <span>30</span>
+            </div>
+          </div>
+
+          <!-- Cache Usage Stats -->
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="text-sm font-medium" data-i18n="options_storageUsage">Storage Usage</span>
+              <span class="text-xs font-bold" id="cacheUsageText" data-i18n="options_loading">Loading...</span>
+            </div>
+            <progress id="cacheUsageProgress" class="progress progress-primary w-full h-2" value="0" max="100"></progress>
+            <div class="flex justify-between text-xs text-base-content/50">
+              <span id="cacheBytesUsed">0 KB</span>
+              <span>10 MB</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div class="bg-base-200 rounded-lg p-2 text-center">
+                <div class="text-xs text-base-content/60" data-i18n="options_cachedEntries">Cached</div>
+                <div class="text-lg font-bold" id="cacheEntryCount">0</div>
+              </div>
+              <div class="bg-base-200 rounded-lg p-2 text-center">
+                <div class="text-xs text-base-content/60" data-i18n="options_expiredEntries">Expired</div>
+                <div class="text-lg font-bold" id="cacheExpiredCount">0</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex gap-2">
+            <button id="refreshCacheStats" class="btn btn-outline btn-sm flex-1" data-i18n="options_refreshStats">Refresh</button>
+            <button id="clearCache" class="btn btn-warning btn-sm flex-1" data-i18n="options_clearAllCache">Clear Cache</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Message -->
+    <div id="toast" class="toast toast-top toast-end z-50">
+      <div id="toastAlert" class="alert alert-success shadow-lg hidden py-2 px-3">
+        <span id="toastText" class="text-sm"></span>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

@@ -1,0 +1,232 @@
+{
+  "extensionName": {
+    "message": "Discord メッセージ翻訳"
+  },
+  "extensionDescription": {
+    "message": "Google翻訳、DeepL、OpenAI互換APIを使ってDiscordメッセージを自動翻訳"
+  },
+
+  "common_modeReplace": {
+    "message": "原文を置換"
+  },
+
+  "popup_title": {
+    "message": "Discord 翻訳"
+  },
+  "popup_autoTranslate": {
+    "message": "自動翻訳"
+  },
+  "popup_targetLanguage": {
+    "message": "翻訳先言語"
+  },
+  "popup_translationMode": {
+    "message": "翻訳モード"
+  },
+  "popup_modeAppend": {
+    "message": "両方表示"
+  },
+
+  "status_autoTranslateEnabled": {
+    "message": "自動翻訳を有効にしました"
+  },
+  "status_autoTranslateDisabled": {
+    "message": "自動翻訳を無効にしました"
+  },
+  "status_targetLanguageUpdated": {
+    "message": "翻訳先言語を変更しました"
+  },
+  "status_translationModeUpdated": {
+    "message": "翻訳モードを変更しました"
+  },
+  "status_saving": {
+    "message": "保存中..."
+  },
+  "status_saved": {
+    "message": "保存しました"
+  },
+  "status_saveFailed": {
+    "message": "保存に失敗しました"
+  },
+  "status_cacheRefreshed": {
+    "message": "キャッシュ統計を更新しました"
+  },
+  "status_cacheRefreshFailed": {
+    "message": "キャッシュ統計の更新に失敗しました"
+  },
+  "status_cacheCleared": {
+    "message": "キャッシュを削除しました"
+  },
+  "status_cacheClearFailed": {
+    "message": "キャッシュの削除に失敗しました"
+  },
+
+  "confirm_clearCache": {
+    "message": "キャッシュされた翻訳をすべて削除しますか？"
+  },
+
+  "options_subtitle": {
+    "message": "翻訳の設定を行います"
+  },
+  "options_tabGeneral": {
+    "message": "一般"
+  },
+  "options_tabApi": {
+    "message": "APIキー"
+  },
+  "options_tabCache": {
+    "message": "キャッシュ"
+  },
+  "options_translationMode": {
+    "message": "翻訳モード"
+  },
+  "options_displayMode": {
+    "message": "表示モード"
+  },
+  "options_displayModeHint": {
+    "message": "翻訳の表示方法"
+  },
+  "options_modeAppend": {
+    "message": "両方表示（原文＋翻訳）"
+  },
+  "options_autoTranslation": {
+    "message": "自動翻訳"
+  },
+  "options_enableAutoTranslate": {
+    "message": "自動翻訳を有効にする"
+  },
+  "options_autoTranslateDesc": {
+    "message": "メッセージの表示と同時に自動で翻訳する"
+  },
+  "options_skipTargetLanguage": {
+    "message": "翻訳先言語のメッセージをスキップ"
+  },
+  "options_skipTargetLanguageDesc": {
+    "message": "Chrome言語検出APIでメッセージの言語を判定"
+  },
+  "options_skipTargetLanguageHint": {
+    "message": "Chrome 138以降で言語検出APIの有効化が必要"
+  },
+  "options_targetLanguage": {
+    "message": "翻訳先言語"
+  },
+  "options_translateTo": {
+    "message": "翻訳先"
+  },
+  "options_translationProvider": {
+    "message": "翻訳プロバイダー"
+  },
+  "options_selectProvider": {
+    "message": "プロバイダーを選択"
+  },
+  "options_providerGoogle": {
+    "message": "Google 翻訳"
+  },
+  "options_providerDeepl": {
+    "message": "DeepL"
+  },
+  "options_providerOpenai": {
+    "message": "OpenAI 互換"
+  },
+  "options_chromeBuiltinChecking": {
+    "message": "Chrome 組み込み（確認中...）"
+  },
+  "options_chromeBuiltinFree": {
+    "message": "Chrome 組み込み（無料・APIキー不要）"
+  },
+  "options_chromeBuiltinUnavailable": {
+    "message": "Chrome 組み込み（利用不可）"
+  },
+  "options_chromeBuiltinHint": {
+    "message": "Chrome 138以降でTranslator APIの有効化が必要"
+  },
+  "options_googleTranslateApi": {
+    "message": "Google 翻訳 API"
+  },
+  "options_deeplApi": {
+    "message": "DeepL API"
+  },
+  "options_openaiCompatibleApi": {
+    "message": "OpenAI 互換 API"
+  },
+  "options_getApiKey": {
+    "message": "APIキーを取得"
+  },
+  "options_apiKey": {
+    "message": "APIキー"
+  },
+  "options_apiKeyLocalNote": {
+    "message": "APIキーはローカルに保存され、外部に送信されません"
+  },
+  "options_deeplAccountNote": {
+    "message": "無料・有料アカウント両方に対応"
+  },
+  "options_baseUrl": {
+    "message": "ベースURL"
+  },
+  "options_baseUrlHint": {
+    "message": "例: https://api.openai.com/v1 またはカスタムエンドポイント"
+  },
+  "options_model": {
+    "message": "モデル"
+  },
+  "options_modelHint": {
+    "message": "例: gpt-4, gpt-3.5-turbo, claude-3-5-sonnet-20241022"
+  },
+  "options_cacheDuration": {
+    "message": "キャッシュ期間"
+  },
+  "options_cacheTTL": {
+    "message": "キャッシュ有効期限（日数）"
+  },
+  "options_cacheTTLDefault": {
+    "message": "デフォルト: 7日"
+  },
+  "options_cacheTTLDay": {
+    "message": "$DAYS$日",
+    "placeholders": {
+      "days": { "content": "$1" }
+    }
+  },
+  "options_cacheTTLDays": {
+    "message": "$DAYS$日",
+    "placeholders": {
+      "days": { "content": "$1" }
+    }
+  },
+  "options_cacheUsage": {
+    "message": "キャッシュ使用状況"
+  },
+  "options_storageUsage": {
+    "message": "ストレージ使用量"
+  },
+  "options_loading": {
+    "message": "読み込み中..."
+  },
+  "options_cachedEntries": {
+    "message": "キャッシュ件数"
+  },
+  "options_expiredEntries": {
+    "message": "期限切れ件数"
+  },
+  "options_refreshStats": {
+    "message": "統計を更新"
+  },
+  "options_cacheManagement": {
+    "message": "キャッシュ管理"
+  },
+  "options_cacheInfoNote": {
+    "message": "翻訳のキャッシュにより、APIコストの削減とパフォーマンスの向上が期待できます"
+  },
+  "options_clearAllCache": {
+    "message": "キャッシュをすべて削除"
+  },
+  "options_googleApiKeyPlaceholder": {
+    "message": "Google翻訳のAPIキーを入力"
+  },
+  "options_deeplApiKeyPlaceholder": {
+    "message": "DeepLのAPIキーを入力"
+  },
+  "options_openaiApiKeyPlaceholder": {
+    "message": "APIキーを入力"
+  }
+}

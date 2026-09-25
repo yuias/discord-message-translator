@@ -1,0 +1,40 @@
+* text=auto eol=lf
+
+[attr]lfs-attr filter=lfs diff=lfs merge=lfs -text
+
+# Source
+*.ts        text eol=lf
+*.tsx       text eol=lf
+*.js        text eol=lf
+*.jsx       text eol=lf
+*.mjs       text eol=lf
+*.cjs       text eol=lf
+*.ejs       text eol=lf
+
+# Markup and styles
+*.html      text eol=lf
+*.htm       text eol=lf
+*.css       text eol=lf
+*.scss      text eol=lf
+*.svg       text
+
+# Data and config
+*.json      text eol=lf
+*.jsonc     text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+*.toml      text eol=lf
+
+# Docs and scripts
+*.md        text eol=lf
+*.txt       text eol=lf
+*.sh        text eol=lf
+
+# Binary assets
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.ico       binary
+*.webp      binary
+*.woff      binary
+*.woff2     binary

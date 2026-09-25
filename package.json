@@ -1,0 +1,39 @@
+{
+  "name": "discord-message-translator",
+  "version": "1.3.0",
+  "description": "Chrome Extension to translate Discord messages automatically",
+  "type": "module",
+  "scripts": {
+    "dev": "wxt",
+    "build": "wxt build",
+    "postinstall": "wxt prepare",
+    "type-check": "tsc --noEmit",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
+  },
+  "keywords": [
+    "chrome-extension",
+    "discord",
+    "translator",
+    "translation"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.4",
+    "@types/chrome": "^0.1.40",
+    "@types/dom-chromium-ai": "^0.0.16",
+    "@types/node": "^20.19.39",
+    "@vitest/coverage-v8": "^4.1.5",
+    "@vitest/ui": "^4.1.5",
+    "daisyui": "^5.5.19",
+    "happy-dom": "^20.9.0",
+    "postcss": "^8.5.10",
+    "tailwindcss": "^4.2.4",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.9",
+    "vitest": "^4.1.5",
+    "wxt": "^0.20.25"
+  }
+}

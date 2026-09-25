@@ -1,0 +1,232 @@
+{
+  "extensionName": {
+    "message": "Discord Message Translator"
+  },
+  "extensionDescription": {
+    "message": "Automatically translate Discord messages with Google Translate, DeepL, or OpenAI-compatible APIs"
+  },
+
+  "common_modeReplace": {
+    "message": "Replace Original"
+  },
+
+  "popup_title": {
+    "message": "Discord Translator"
+  },
+  "popup_autoTranslate": {
+    "message": "Auto Translate"
+  },
+  "popup_targetLanguage": {
+    "message": "Target Language"
+  },
+  "popup_translationMode": {
+    "message": "Translation Mode"
+  },
+  "popup_modeAppend": {
+    "message": "Show Both"
+  },
+
+  "status_autoTranslateEnabled": {
+    "message": "Auto translate enabled"
+  },
+  "status_autoTranslateDisabled": {
+    "message": "Auto translate disabled"
+  },
+  "status_targetLanguageUpdated": {
+    "message": "Target language updated"
+  },
+  "status_translationModeUpdated": {
+    "message": "Translation mode updated"
+  },
+  "status_saving": {
+    "message": "Saving..."
+  },
+  "status_saved": {
+    "message": "Saved"
+  },
+  "status_saveFailed": {
+    "message": "Save failed"
+  },
+  "status_cacheRefreshed": {
+    "message": "Cache statistics refreshed"
+  },
+  "status_cacheRefreshFailed": {
+    "message": "Failed to refresh cache statistics"
+  },
+  "status_cacheCleared": {
+    "message": "Cache cleared successfully!"
+  },
+  "status_cacheClearFailed": {
+    "message": "Failed to clear cache"
+  },
+
+  "confirm_clearCache": {
+    "message": "Are you sure you want to clear all cached translations?"
+  },
+
+  "options_subtitle": {
+    "message": "Configure your translation preferences"
+  },
+  "options_tabGeneral": {
+    "message": "General"
+  },
+  "options_tabApi": {
+    "message": "API Keys"
+  },
+  "options_tabCache": {
+    "message": "Cache"
+  },
+  "options_translationMode": {
+    "message": "Translation Mode"
+  },
+  "options_displayMode": {
+    "message": "Display Mode"
+  },
+  "options_displayModeHint": {
+    "message": "How translations are shown"
+  },
+  "options_modeAppend": {
+    "message": "Show Both (Original + Translation)"
+  },
+  "options_autoTranslation": {
+    "message": "Auto-Translation"
+  },
+  "options_enableAutoTranslate": {
+    "message": "Enable automatic translation"
+  },
+  "options_autoTranslateDesc": {
+    "message": "Automatically translate messages as they appear"
+  },
+  "options_skipTargetLanguage": {
+    "message": "Skip messages already in target language"
+  },
+  "options_skipTargetLanguageDesc": {
+    "message": "Uses Chrome Language Detection API to detect message language"
+  },
+  "options_skipTargetLanguageHint": {
+    "message": "Requires Chrome 138+ with Language Detection API enabled"
+  },
+  "options_targetLanguage": {
+    "message": "Target Language"
+  },
+  "options_translateTo": {
+    "message": "Translate to"
+  },
+  "options_translationProvider": {
+    "message": "Translation Provider"
+  },
+  "options_selectProvider": {
+    "message": "Select Provider"
+  },
+  "options_providerGoogle": {
+    "message": "Google Translate"
+  },
+  "options_providerDeepl": {
+    "message": "DeepL"
+  },
+  "options_providerOpenai": {
+    "message": "OpenAI Compatible"
+  },
+  "options_chromeBuiltinChecking": {
+    "message": "Chrome Built-in (Checking...)"
+  },
+  "options_chromeBuiltinFree": {
+    "message": "Chrome Built-in (Free, No API Key)"
+  },
+  "options_chromeBuiltinUnavailable": {
+    "message": "Chrome Built-in (Not Available)"
+  },
+  "options_chromeBuiltinHint": {
+    "message": "Chrome Built-in requires Chrome 138+ with Translator API enabled"
+  },
+  "options_googleTranslateApi": {
+    "message": "Google Translate API"
+  },
+  "options_deeplApi": {
+    "message": "DeepL API"
+  },
+  "options_openaiCompatibleApi": {
+    "message": "OpenAI Compatible API"
+  },
+  "options_getApiKey": {
+    "message": "Get API Key"
+  },
+  "options_apiKey": {
+    "message": "API Key"
+  },
+  "options_apiKeyLocalNote": {
+    "message": "Your API key is stored locally and never shared"
+  },
+  "options_deeplAccountNote": {
+    "message": "Supports both free and paid accounts"
+  },
+  "options_baseUrl": {
+    "message": "Base URL"
+  },
+  "options_baseUrlHint": {
+    "message": "e.g., https://api.openai.com/v1 or custom endpoint"
+  },
+  "options_model": {
+    "message": "Model"
+  },
+  "options_modelHint": {
+    "message": "e.g., gpt-4, gpt-3.5-turbo, claude-3-5-sonnet-20241022"
+  },
+  "options_cacheDuration": {
+    "message": "Cache Duration"
+  },
+  "options_cacheTTL": {
+    "message": "Cache TTL (days)"
+  },
+  "options_cacheTTLDefault": {
+    "message": "Default: 7 days"
+  },
+  "options_cacheTTLDay": {
+    "message": "$DAYS$ day",
+    "placeholders": {
+      "days": { "content": "$1" }
+    }
+  },
+  "options_cacheTTLDays": {
+    "message": "$DAYS$ days",
+    "placeholders": {
+      "days": { "content": "$1" }
+    }
+  },
+  "options_cacheUsage": {
+    "message": "Cache Usage"
+  },
+  "options_storageUsage": {
+    "message": "Storage Usage"
+  },
+  "options_loading": {
+    "message": "Loading..."
+  },
+  "options_cachedEntries": {
+    "message": "Cached Entries"
+  },
+  "options_expiredEntries": {
+    "message": "Expired Entries"
+  },
+  "options_refreshStats": {
+    "message": "Refresh Stats"
+  },
+  "options_cacheManagement": {
+    "message": "Cache Management"
+  },
+  "options_cacheInfoNote": {
+    "message": "Cached translations reduce API costs and improve performance"
+  },
+  "options_clearAllCache": {
+    "message": "Clear All Cached Translations"
+  },
+  "options_googleApiKeyPlaceholder": {
+    "message": "Enter your Google Translate API key"
+  },
+  "options_deeplApiKeyPlaceholder": {
+    "message": "Enter your DeepL API key"
+  },
+  "options_openaiApiKeyPlaceholder": {
+    "message": "Enter your API key"
+  }
+}
