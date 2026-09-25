@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ChromeStorageCache } from './chrome-storage';
 import type { TranslationCacheEntry } from '@/types/cache';
-import { mockedAsync } from '@/vitest.setup';
+import { mockedAsync } from '../../../vitest.setup';
 
 describe('ChromeStorageCache', () => {
   let cache: ChromeStorageCache;

@@ -96,15 +96,16 @@ pnpm type-check
 
 ```
 discord-message-translator/
-├── entrypoints/
-│   ├── background/          # Service Worker
-│   ├── content/             # Content Script (injected into Discord)
-│   └── popup/               # Popup UI (includes all settings)
-├── lib/
-│   ├── api/                 # Translation API clients
-│   ├── cache/               # Cache implementation
-│   └── utils/               # Utility functions
-├── types/                   # TypeScript type definitions
+├── src/
+│   ├── entrypoints/
+│   │   ├── background.ts    # Service Worker
+│   │   ├── content/         # Content Script (injected into Discord)
+│   │   └── popup/           # Popup UI (includes all settings)
+│   ├── lib/
+│   │   ├── api/              # Translation API clients
+│   │   ├── cache/            # Cache implementation
+│   │   └── utils/            # Utility functions
+│   └── types/                # TypeScript type definitions
 ├── public/
 │   ├── _locales/            # i18n messages (en, ja)
 │   └── icons/               # Extension icons

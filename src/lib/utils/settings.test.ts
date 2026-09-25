@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { getSettings, updateSettings } from './settings';
 import { DEFAULT_SETTINGS } from '@/types/settings';
-import { mockedAsync } from '@/vitest.setup';
+import { mockedAsync } from '../../../vitest.setup';
 
 describe('Settings Utilities', () => {
   beforeEach(() => {

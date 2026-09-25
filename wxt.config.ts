@@ -1,9 +1,7 @@
 import { defineConfig } from 'wxt';
-import { resolve } from 'node:path';
 
 export default defineConfig({
-  srcDir: '.',
-  entrypointsDir: 'entrypoints',
+  srcDir: 'src',
   manifest: {
     name: '__MSG_extensionName__',
     version: '1.3.0',
@@ -19,8 +17,5 @@ export default defineConfig({
       48: '/icons/icon48.png',
       128: '/icons/icon128.png',
     },
-  },
-  alias: {
-    '@': resolve(__dirname),
   },
 });
