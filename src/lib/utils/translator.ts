@@ -25,6 +25,13 @@ export async function translateMessage(
   // Call API
   const translation = await client.translate(text, targetLang);
 
+  // chrome-builtin returns the original text when it cannot translate (unsupported
+  // pair, missing language pack, etc). Caching that would pin the message as
+  // untranslated even after the pack becomes available.
+  if (settings.translationProvider === 'chrome-builtin' && translation === text) {
+    return translation;
+  }
+
   // Save to cache
   const entry: TranslationCacheEntry = {
     translations: {
@@ -94,6 +101,11 @@ export async function translateMessageBatch(
     if (message === undefined || translation === undefined) continue;
 
     results.set(message.id, translation);
+
+    // See the comment in translateMessage: skip caching a chrome-builtin no-op.
+    if (settings.translationProvider === 'chrome-builtin' && translation === message.content) {
+      continue;
+    }
 
     // Update cache
     const cached = await storage.get(message.id);

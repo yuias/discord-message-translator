@@ -14,7 +14,7 @@ export class ChromeBuiltinTranslator {
    * Check if the Chrome Translator API is available in the current browser
    */
   static isAvailable(): boolean {
-    return 'Translator' in self;
+    return 'Translator' in globalThis;
   }
 
   /**

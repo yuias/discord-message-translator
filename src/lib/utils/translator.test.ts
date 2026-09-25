@@ -31,6 +31,21 @@ vi.mock('@/lib/api/openai-compatible', () => ({
   }),
 }));
 
+// factory.ts caches a single ChromeBuiltinTranslator instance, so the mock
+// instance methods are hoisted and shared across every `new` call.
+const chromeBuiltinMocks = vi.hoisted(() => ({
+  translate: vi.fn(),
+  translateBatch: vi.fn(),
+}));
+
+vi.mock('@/lib/api/chrome-builtin', () => {
+  const ChromeBuiltinTranslator = vi.fn().mockImplementation(function () {
+    return { translate: chromeBuiltinMocks.translate, translateBatch: chromeBuiltinMocks.translateBatch };
+  });
+  (ChromeBuiltinTranslator as unknown as { isAvailable: () => boolean }).isAvailable = () => true;
+  return { ChromeBuiltinTranslator };
+});
+
 import { createStorage } from '@/lib/cache/factory';
 import { getSettings } from './settings';
 import { GoogleTranslateClient } from '@/lib/api/google-translate';
@@ -55,6 +70,7 @@ describe('Translator Utilities', () => {
     vi.mocked(GoogleTranslateClient).mockImplementation(function () {
       return { translate: mockTranslate } as any;
     });
+    chromeBuiltinMocks.translate.mockReset();
   });
 
   describe('translateMessage', () => {
@@ -213,6 +229,33 @@ describe('Translator Utilities', () => {
           },
         })
       );
+    });
+
+    it('does not cache a chrome-builtin result that equals the original text', async () => {
+      mockStorage.get.mockResolvedValue(null);
+      chromeBuiltinMocks.translate.mockResolvedValue('Hello');
+      vi.mocked(getSettings).mockResolvedValue({
+        translationProvider: 'chrome-builtin',
+      } as any);
+
+      const result = await translateMessage('msg-chrome-builtin', 'Hello', 'ja');
+
+      expect(result).toBe('Hello');
+      expect(mockStorage.set).not.toHaveBeenCalled();
+    });
+
+    it('caches a google result that equals the original text', async () => {
+      mockStorage.get.mockResolvedValue(null);
+      mockTranslate.mockResolvedValue('Hello');
+      vi.mocked(getSettings).mockResolvedValue({
+        translationProvider: 'google',
+        apiKeys: { google: 'test-key' },
+      } as any);
+
+      const result = await translateMessage('msg-google-noop', 'Hello', 'ja');
+
+      expect(result).toBe('Hello');
+      expect(mockStorage.set).toHaveBeenCalled();
     });
   });
 });

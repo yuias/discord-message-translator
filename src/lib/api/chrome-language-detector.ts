@@ -1,5 +1,7 @@
 /// <reference types="@types/dom-chromium-ai" />
 
+import { isSameLanguage } from '@/lib/utils/language';
+
 /**
  * Language detection result
  */
@@ -21,7 +23,7 @@ export class ChromeLanguageDetector {
    * Check if the Chrome Language Detector API is available in the current browser
    */
   static isAvailable(): boolean {
-    return 'LanguageDetector' in self;
+    return 'LanguageDetector' in globalThis;
   }
 
   /**
@@ -99,28 +101,23 @@ export class ChromeLanguageDetector {
   }
 
   /**
-   * Get the most likely language for the given text
+   * Detect the source language to use for translation.
    * @param text Text to detect language for
    * @param minConfidence Minimum confidence threshold (default: 0.5)
-   * @returns The detected language code or null if confidence is too low
+   * @returns The top candidate, or null if it is 'und' or below minConfidence
    */
-  async detectPrimaryLanguage(
+  async detectSourceLanguage(
     text: string,
     minConfidence = 0.5
   ): Promise<string | null> {
     const results = await this.detect(text);
 
-    if (results.length === 0) {
-      return null;
-    }
-
     const primary = results[0];
     if (!primary) return null;
-    if (primary.confidence >= minConfidence) {
-      return primary.detectedLanguage;
-    }
+    if (primary.detectedLanguage === 'und') return null;
+    if (primary.confidence < minConfidence) return null;
 
-    return null;
+    return primary.detectedLanguage;
   }
 
   /**
@@ -142,10 +139,7 @@ export class ChromeLanguageDetector {
 
     const primary = results[0];
     if (!primary) return false;
-    // Normalize language codes for comparison (e.g., "ja" matches "ja", "en" matches "en-US")
-    const normalizedDetected = (primary.detectedLanguage.split('-')[0] ?? primary.detectedLanguage).toLowerCase();
-    const normalizedExpected = (languageCode.split('-')[0] ?? languageCode).toLowerCase();
 
-    return normalizedDetected === normalizedExpected && primary.confidence >= minConfidence;
+    return isSameLanguage(primary.detectedLanguage, languageCode) && primary.confidence >= minConfidence;
   }
 }
