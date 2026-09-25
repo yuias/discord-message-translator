@@ -56,7 +56,7 @@ export class ChromeLanguageDetector {
       return this.initPromise;
     }
 
-    this.initPromise = (async () => {
+    const initPromise = (async () => {
       if (!ChromeLanguageDetector.isAvailable()) {
         throw new Error('Chrome Language Detector API is not available');
       }
@@ -69,7 +69,18 @@ export class ChromeLanguageDetector {
       }
     })();
 
-    return this.initPromise;
+    this.initPromise = initPromise;
+    // Don't keep a rejected initPromise forever: let a later call retry
+    // instead of every future call replaying the same rejection. Only clear
+    // it if it is still the promise we set (a concurrent call may have
+    // already replaced it).
+    initPromise.catch(() => {
+      if (this.initPromise === initPromise) {
+        this.initPromise = null;
+      }
+    });
+
+    return initPromise;
   }
 
   /**
