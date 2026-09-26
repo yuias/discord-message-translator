@@ -8,7 +8,7 @@ export interface Settings {
   };
   openaiConfig?: {
     baseUrl: string; // e.g., https://api.openai.com/v1
-    model: string;   // e.g., gpt-4, claude-3-5-sonnet-20241022
+    model: string;   // model name as expected by the endpoint
   };
 
   // Translation settings

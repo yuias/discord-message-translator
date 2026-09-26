@@ -5,7 +5,7 @@ Chrome Extension to automatically translate Discord messages with Google Transla
 ## Features
 
 - **Auto Translation**: Automatically translate Discord messages as they appear
-- **Multiple Translation Providers**: Support for Chrome Built-in Translator, Google Translate, DeepL, and OpenAI-compatible APIs (GPT-4, Claude, Gemini, etc.)
+- **Multiple Translation Providers**: Support for Chrome Built-in Translator, Google Translate, DeepL, and OpenAI-compatible APIs
 - **Chrome Built-in Translator**: Free translation using Chrome's native API (no API key required)
 - **Language Detection**: Skip translation for messages already in target language (using Chrome's Language Detector API)
 - **Smart Caching**: Message ID-based caching with automatic cleanup to reduce API costs
@@ -46,15 +46,11 @@ This will create a `.output/chrome-mv3` folder with the compiled extension.
    - **Google Translate**: Get an API key from [Google Cloud Translation API](https://cloud.google.com/translate/docs)
    - **DeepL**: Get an API key from [DeepL API](https://www.deepl.com/pro-api)
    - **OpenAI-compatible API**: Configure with any OpenAI-compatible endpoint
-     - OpenAI (GPT-4, GPT-3.5)
-     - Anthropic Claude (via compatible endpoints)
-     - Google Gemini (via compatible endpoints)
-     - Other OpenAI-compatible services
 3. Enter your API key and configure provider-specific settings (auto-saved)
 
 For OpenAI-compatible APIs, you'll need to configure:
 - **Base URL**: API endpoint (e.g., `https://api.openai.com/v1`)
-- **Model**: Model name (e.g., `gpt-4`, `claude-3-5-sonnet-20241022`)
+- **Model**: Model name as expected by the endpoint
 - **API Key**: Your API key for the service
 
 ## Development
@@ -182,10 +178,7 @@ options page (detailed configuration). Open the options page from the popup's
 #### OpenAI-compatible APIs
 - LLM-powered translation with context awareness
 - Automatic source language detection
-- Supports multiple models:
-  - OpenAI GPT-4, GPT-3.5
-  - Anthropic Claude (via compatible endpoints)
-  - Google Gemini (via compatible endpoints)
+- Works with any service that exposes an OpenAI-compatible Chat Completions API
 - Best for nuanced or contextual translations
 
 ### Future Enhancements

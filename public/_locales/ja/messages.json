@@ -194,7 +194,7 @@
     "message": "モデル"
   },
   "options_modelHint": {
-    "message": "例: gpt-4, gpt-3.5-turbo, claude-3-5-sonnet-20241022"
+    "message": "エンドポイントが受け付けるモデル名"
   },
   "options_cacheDuration": {
     "message": "キャッシュ期間"

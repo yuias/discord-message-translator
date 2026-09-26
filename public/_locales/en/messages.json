@@ -194,7 +194,7 @@
     "message": "Model"
   },
   "options_modelHint": {
-    "message": "e.g., gpt-4, gpt-3.5-turbo, claude-3-5-sonnet-20241022"
+    "message": "Model name as expected by the endpoint"
   },
   "options_cacheDuration": {
     "message": "Cache Duration"
