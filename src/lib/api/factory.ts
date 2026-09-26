@@ -37,6 +37,9 @@ export function createTranslationClient(settings: Settings): TranslationClient {
       if (!settings.apiKeys.openai || !settings.openaiConfig) {
         throw new Error('OpenAI API is not configured');
       }
+      if (!settings.openaiConfig.model) {
+        throw new Error('OpenAI model is not configured');
+      }
       return new OpenAICompatibleClient({
         apiKey: settings.apiKeys.openai,
         baseUrl: settings.openaiConfig.baseUrl,

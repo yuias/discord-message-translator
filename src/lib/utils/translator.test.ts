@@ -202,6 +202,19 @@ describe('Translator Utilities', () => {
       );
     });
 
+    it('should throw error if OpenAI model is not configured', async () => {
+      mockStorage.get.mockResolvedValue(null);
+      vi.mocked(getSettings).mockResolvedValue({
+        translationProvider: 'openai',
+        apiKeys: { openai: 'test-key' },
+        openaiConfig: { baseUrl: 'https://api.example.com/v1', model: '' },
+      } as any);
+
+      await expect(translateMessage('msg-openai-model', 'Hello', 'ja')).rejects.toThrow(
+        'OpenAI model is not configured'
+      );
+    });
+
     it('should merge new translation with existing cache', async () => {
       const messageId = 'msg-999';
       const existingCache = {

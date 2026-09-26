@@ -141,7 +141,7 @@ async function loadSettings() {
   deeplApiKeyInput.value = settings.apiKeys.deepl || '';
   openaiApiKeyInput.value = settings.apiKeys.openai || '';
   openaiBaseUrlInput.value = settings.openaiConfig?.baseUrl || 'https://api.openai.com/v1';
-  openaiModelInput.value = settings.openaiConfig?.model || 'gpt-4';
+  openaiModelInput.value = settings.openaiConfig?.model || '';
   cacheTTLDaysInput.value = settings.cacheTTLDays.toString();
   updateCacheTTLDisplay(settings.cacheTTLDays);
 
@@ -229,7 +229,7 @@ deeplApiKeyInput.addEventListener('input', () => {
 openaiApiKeyInput.addEventListener('input', () => {
   const apiKey = openaiApiKeyInput.value.trim();
   const baseUrl = openaiBaseUrlInput.value.trim() || 'https://api.openai.com/v1';
-  const model = openaiModelInput.value.trim() || 'gpt-4';
+  const model = openaiModelInput.value.trim();
   autoSave({
     apiKeys: { openai: apiKey || undefined },
     openaiConfig: apiKey ? { baseUrl, model } : undefined,
@@ -239,14 +239,14 @@ openaiApiKeyInput.addEventListener('input', () => {
 // OpenAI Base URL input
 openaiBaseUrlInput.addEventListener('input', () => {
   const baseUrl = openaiBaseUrlInput.value.trim() || 'https://api.openai.com/v1';
-  const model = openaiModelInput.value.trim() || 'gpt-4';
+  const model = openaiModelInput.value.trim();
   autoSave({ openaiConfig: { baseUrl, model } });
 });
 
 // OpenAI Model input
 openaiModelInput.addEventListener('input', () => {
   const baseUrl = openaiBaseUrlInput.value.trim() || 'https://api.openai.com/v1';
-  const model = openaiModelInput.value.trim() || 'gpt-4';
+  const model = openaiModelInput.value.trim();
   autoSave({ openaiConfig: { baseUrl, model } });
 });
 
