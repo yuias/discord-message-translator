@@ -1,6 +1,6 @@
 {
   "name": "discord-message-translator",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Chrome Extension to translate Discord messages automatically",
   "type": "module",
   "scripts": {
