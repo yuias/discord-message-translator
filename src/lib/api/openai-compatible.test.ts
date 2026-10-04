@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { OpenAICompatibleClient, parseExtraBody } from './openai-compatible';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { OpenAICompatibleClient, parseExtraBody, REQUEST_TIMEOUT_MS } from './openai-compatible';
 
 // Mock fetch
 global.fetch = vi.fn();
@@ -117,6 +117,7 @@ describe('OpenAICompatibleClient', () => {
     it('should throw error on API failure', async () => {
       vi.mocked(fetch).mockResolvedValue({
         ok: false,
+        status: 401,
         statusText: 'Unauthorized',
         text: async () => JSON.stringify({
           error: {
@@ -125,8 +126,59 @@ describe('OpenAICompatibleClient', () => {
         }),
       } as Response);
 
+      const error = await client.translate('Hello', 'fr').catch((e: unknown) => e);
+      expect(error).toBeInstanceOf(Error);
+      const message = (error as Error).message;
+      expect(message).toContain('OpenAI API Error');
+      expect(message).toContain('401');
+      expect(message).toContain('Invalid API key');
+    });
+
+    it('should include nested error details from the response body', async () => {
+      vi.mocked(fetch).mockResolvedValue({
+        ok: false,
+        status: 400,
+        statusText: 'Bad Request',
+        text: async () => JSON.stringify({
+          error: { message: 'Provider returned error', metadata: { raw: 'upstream detail' } },
+        }),
+      } as Response);
+
+      await expect(client.translate('Hello', 'fr')).rejects.toThrow('upstream detail');
+    });
+
+    it('should trim a non-JSON error body', async () => {
+      vi.mocked(fetch).mockResolvedValue({
+        ok: false,
+        status: 502,
+        statusText: 'Bad Gateway',
+        text: async () => '  Bad gateway  ',
+      } as Response);
+
+      await expect(client.translate('Hello', 'fr')).rejects.toThrow('Bad gateway');
+    });
+
+    it.each([
+      ['reasoning_content', { content: '', reasoning_content: 'thinking...' }, undefined],
+      ['reasoning', { content: null, reasoning: 'x' }, undefined],
+      ['finish_reason length', { content: '' }, 'length'],
+    ])('should report exhausted output budget (%s)', async (_label, message, finishReason) => {
+      vi.mocked(fetch).mockResolvedValue({
+        ok: true,
+        json: async () => ({ choices: [{ finish_reason: finishReason, message }] }),
+      } as Response);
+
+      await expect(client.translate('Hello', 'fr')).rejects.toThrow('returned no translation');
+    });
+
+    it.each([{ choices: [] }, {}])('should report empty translation for %j', async (payload) => {
+      vi.mocked(fetch).mockResolvedValue({
+        ok: true,
+        json: async () => payload,
+      } as Response);
+
       await expect(client.translate('Hello', 'fr')).rejects.toThrow(
-        'OpenAI API Error'
+        'OpenAI API returned empty translation'
       );
     });
 
@@ -407,6 +459,71 @@ describe('OpenAICompatibleClient', () => {
         'Invalid extra request body'
       );
       expect(fetch).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('request timeout', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    function signalOf(init: RequestInit | undefined): AbortSignal {
+      if (!init?.signal) throw new Error('expected fetch to receive a signal');
+      return init.signal;
+    }
+
+    const rejectOnAbort = (signal: AbortSignal) =>
+      new Promise<never>((_, reject) =>
+        signal.addEventListener('abort', () =>
+          reject(new DOMException('Aborted', 'AbortError'))));
+
+    it('aborts when headers never arrive', async () => {
+      vi.mocked(fetch).mockImplementation((_url, init) => rejectOnAbort(signalOf(init)));
+
+      const promise = client.translate('Hello', 'fr');
+      const assertion = expect(promise).rejects.toThrow('LLM did not respond within 120 s');
+      await vi.advanceTimersByTimeAsync(REQUEST_TIMEOUT_MS);
+      await assertion;
+    });
+
+    it('aborts when the body read stalls', async () => {
+      vi.mocked(fetch).mockImplementation(async (_url, init) => {
+        const signal = signalOf(init);
+        const json = (): Promise<unknown> => rejectOnAbort(signal);
+        return { ok: true, json } as Response;
+      });
+
+      const promise = client.translate('Hello', 'fr');
+      const assertion = expect(promise).rejects.toThrow('LLM did not respond within 120 s');
+      await vi.advanceTimersByTimeAsync(REQUEST_TIMEOUT_MS);
+      await assertion;
+    });
+
+    it('does not fall back to individual requests on timeout', async () => {
+      vi.mocked(fetch).mockImplementation((_url, init) => rejectOnAbort(signalOf(init)));
+
+      const promise = client.translateBatch(['Hello', 'Goodbye'], 'fr');
+      const assertion = expect(promise).rejects.toThrow('LLM did not respond within 120 s');
+      await vi.advanceTimersByTimeAsync(REQUEST_TIMEOUT_MS);
+      await assertion;
+      expect(fetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('passes an abort signal and clears the timer after success', async () => {
+      vi.mocked(fetch).mockResolvedValue({
+        ok: true,
+        json: async () => ({ choices: [{ message: { content: 'Bonjour' } }] }),
+      } as Response);
+
+      await expect(client.translate('Hello', 'fr')).resolves.toBe('Bonjour');
+
+      const callArgs = firstCall(vi.mocked(fetch).mock.calls);
+      expect(callArgs[1]?.signal).toBeInstanceOf(AbortSignal);
+      expect(vi.getTimerCount()).toBe(0);
     });
   });
 });

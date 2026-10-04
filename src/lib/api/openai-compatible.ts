@@ -12,10 +12,32 @@ interface ChatMessage {
 
 interface ChatCompletionResponse {
   choices?: Array<{
+    finish_reason?: string | null;
     message?: {
       content?: string | null;
+      reasoning_content?: string | null;
+      reasoning?: string | null;
     };
   }>;
+}
+
+// Non-streaming responses from reasoning models only arrive once the whole
+// answer is ready, so the limit is generous.
+export const REQUEST_TIMEOUT_MS = 120_000;
+
+const REASONING_EXHAUSTED_MESSAGE =
+  'OpenAI API returned no translation: the model likely used its whole output budget on reasoning. ' +
+  'Raise max_tokens or reduce reasoning via the extra request body setting, ' +
+  'e.g. {"max_tokens": 8000} or {"reasoning_effort": "low"}.';
+
+// Keep the whole body: gateways nest the real cause (e.g. under metadata)
+// where error.message alone hides it. Indent JSON so it stays readable.
+function formatErrorBody(body: string): string {
+  try {
+    return JSON.stringify(JSON.parse(body), null, 2);
+  } catch {
+    return body.trim();
+  }
 }
 
 export type ExtraBodyResult =
@@ -180,35 +202,54 @@ Third translation here`;
       if (value === null) delete body[key];
     }
 
-    const response = await fetch(`${this.config.baseUrl}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.config.apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
+    const controller = new AbortController();
+    let timedOut = false;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, REQUEST_TIMEOUT_MS);
 
-    if (!response.ok) {
-      const errorBody = await response.text().catch(() => '');
-      let errorMessage = response.statusText || 'Unknown error';
-      try {
-        const errorJson = JSON.parse(errorBody);
-        errorMessage = errorJson.error?.message || errorJson.message || errorMessage;
-      } catch {
-        if (errorBody) errorMessage = errorBody;
+    try {
+      const response = await fetch(`${this.config.baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.config.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.text().catch(() => '');
+        const status = [response.status, response.statusText].filter(Boolean).join(' ');
+        const detail = formatErrorBody(errorBody) || response.statusText || 'Unknown error';
+        throw new Error(`OpenAI API Error${status ? ` (${status})` : ''}: ${detail}`);
       }
-      throw new Error(`OpenAI API Error: ${errorMessage}`);
+
+      const data = (await response.json()) as ChatCompletionResponse;
+      const choice = data?.choices?.[0];
+      const content = choice?.message?.content?.trim();
+
+      if (!content) {
+        const reasoning = choice?.message?.reasoning_content || choice?.message?.reasoning;
+        if ((typeof reasoning === 'string' && reasoning.trim()) || choice?.finish_reason === 'length') {
+          throw new Error(REASONING_EXHAUSTED_MESSAGE);
+        }
+        throw new Error('OpenAI API returned empty translation');
+      }
+
+      return content;
+    } catch (error) {
+      // Detect our own timer rather than error.name: the abort reason can vary
+      // by runtime and by mock.
+      if (timedOut) {
+        throw new Error(`LLM did not respond within ${REQUEST_TIMEOUT_MS / 1000} s`);
+      }
+      throw error;
+    } finally {
+      clearTimeout(timer);
     }
-
-    const data: ChatCompletionResponse = await response.json();
-    const content = data?.choices?.[0]?.message?.content?.trim();
-
-    if (!content) {
-      throw new Error('OpenAI API returned empty translation');
-    }
-
-    return content;
   }
 
   /**
