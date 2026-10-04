@@ -52,6 +52,7 @@ For OpenAI-compatible APIs, you'll need to configure:
 - **Base URL**: API endpoint (e.g., `https://api.openai.com/v1`)
 - **Model**: Model name as expected by the endpoint
 - **API Key**: Your API key for the service
+- **Extra request body (JSON)**: Optional; see [Reasoning models](#reasoning-models)
 
 ## Development
 
@@ -180,6 +181,14 @@ options page (detailed configuration). Open the options page from the popup's
 - Automatic source language detection
 - Works with any service that exposes an OpenAI-compatible Chat Completions API
 - Best for nuanced or contextual translations
+
+#### Reasoning models
+- The **Extra request body (JSON)** option takes a JSON object that is merged into every chat-completions request, e.g. `{"reasoning_effort": "low"}` or `{"max_tokens": 8000}`
+- It can override `temperature` and `max_tokens`, but not `model` or `messages`
+- A `null` value removes the field from the request, for endpoints that reject `max_tokens` or `temperature`, e.g. `{"max_tokens": null}`
+- Each request times out after 120 seconds without a complete response; responses are not streamed, so a long reasoning phase counts against the limit
+- If the model returns reasoning but no translated text, or stops at the token limit, the extension reports that instead of an empty translation; raise `max_tokens` or lower the reasoning effort via the extra request body
+- Invalid JSON in the field is not saved; the options page shows the parse error
 
 ### Future Enhancements
 
