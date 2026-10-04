@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { OpenAICompatibleClient } from './openai-compatible';
+import { OpenAICompatibleClient, parseExtraBody } from './openai-compatible';
 
 // Mock fetch
 global.fetch = vi.fn();
@@ -323,6 +323,90 @@ describe('OpenAICompatibleClient', () => {
       expect(result).toEqual(['Bonjour', 'Au revoir']);
       // 1 batch call + 2 individual fallback calls
       expect(fetch).toHaveBeenCalledTimes(3);
+    });
+  });
+
+  describe('parseExtraBody', () => {
+    it.each([undefined, '', '  '])('treats %j as no extra body', (input) => {
+      expect(parseExtraBody(input)).toEqual({ ok: true, value: null });
+    });
+
+    it('parses a JSON object', () => {
+      expect(parseExtraBody('{"a":1}')).toEqual({ ok: true, value: { a: 1 } });
+    });
+
+    it.each(['{', '[1]', '1', '"x"', 'null'])('rejects %j', (input) => {
+      expect(parseExtraBody(input).ok).toBe(false);
+    });
+  });
+
+  describe('extra request body', () => {
+    const DELIMITER = '===TRANSLATION_SEPARATOR===';
+
+    function clientWithExtra(extraBody: string): OpenAICompatibleClient {
+      return new OpenAICompatibleClient({ apiKey, baseUrl, model, extraBody });
+    }
+
+    function mockContent(content: string): void {
+      vi.mocked(fetch).mockResolvedValue({
+        ok: true,
+        json: async () => ({ choices: [{ message: { content } }] }),
+      } as Response);
+    }
+
+    function requestBody(): Record<string, unknown> {
+      const callArgs = firstCall(vi.mocked(fetch).mock.calls);
+      return JSON.parse(callArgs[1]?.body as string);
+    }
+
+    it('merges extra fields and lets them override temperature', async () => {
+      mockContent('Bonjour');
+
+      await clientWithExtra('{"reasoning_effort":"low","temperature":0.7}').translate('Hello', 'fr');
+
+      const body = requestBody();
+      expect(body.reasoning_effort).toBe('low');
+      expect(body.temperature).toBe(0.7);
+      expect(body.max_tokens).toBe(1000);
+    });
+
+    it('does not let extra fields override model or messages', async () => {
+      mockContent('Bonjour');
+
+      await clientWithExtra('{"model":"x","messages":[]}').translate('Hello', 'fr');
+
+      const body = requestBody();
+      expect(body.model).toBe(model);
+      expect(body.messages).toHaveLength(2);
+    });
+
+    it('removes fields set to null', async () => {
+      mockContent('Bonjour');
+
+      await clientWithExtra('{"max_tokens":null,"temperature":null}').translate('Hello', 'fr');
+
+      const body = requestBody();
+      expect('max_tokens' in body).toBe(false);
+      expect('temperature' in body).toBe(false);
+      expect(body.model).toBe(model);
+      expect(body.messages).toBeDefined();
+    });
+
+    it('applies the extra body to translateBatch via the shared path', async () => {
+      mockContent(`Bonjour\n${DELIMITER}\nAu revoir`);
+
+      const result = await clientWithExtra('{"max_tokens":null}').translateBatch(['Hello', 'Goodbye'], 'fr');
+
+      expect(result).toEqual(['Bonjour', 'Au revoir']);
+      expect('max_tokens' in requestBody()).toBe(false);
+      expect(fetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('rejects before fetching when the stored text is invalid', async () => {
+      await expect(clientWithExtra('{').translate('Hello', 'fr')).rejects.toThrow(
+        'Invalid extra request body'
+      );
+      expect(fetch).not.toHaveBeenCalled();
     });
   });
 });

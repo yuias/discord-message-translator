@@ -9,6 +9,8 @@ export interface Settings {
   openaiConfig?: {
     baseUrl: string; // e.g., https://api.openai.com/v1
     model: string;   // model name as expected by the endpoint
+    // Raw JSON object text merged into each chat-completions request body.
+    extraBody?: string;
   };
 
   // Translation settings

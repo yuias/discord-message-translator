@@ -2,6 +2,7 @@ interface OpenAIConfig {
   baseUrl: string;
   model: string;
   apiKey: string;
+  extraBody?: string;
 }
 
 interface ChatMessage {
@@ -9,19 +10,36 @@ interface ChatMessage {
   content: string;
 }
 
-interface ChatCompletionRequest {
-  model: string;
-  messages: ChatMessage[];
-  temperature?: number;
-  max_tokens?: number;
-}
-
 interface ChatCompletionResponse {
-  choices: Array<{
-    message: {
-      content: string;
+  choices?: Array<{
+    message?: {
+      content?: string | null;
     };
   }>;
+}
+
+export type ExtraBodyResult =
+  | { ok: true; value: Record<string, unknown> | null }
+  | { ok: false; error: string };
+
+/** Empty/whitespace/undefined text means "no extra body". */
+export function parseExtraBody(text: string | undefined): ExtraBodyResult {
+  if (text === undefined || text.trim() === '') {
+    return { ok: true, value: null };
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text);
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : String(error) };
+  }
+
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    return { ok: false, error: 'Must be a JSON object, e.g. {"key": "value"}' };
+  }
+
+  return { ok: true, value: parsed as Record<string, unknown> };
 }
 
 export class OpenAICompatibleClient {
@@ -62,42 +80,7 @@ Rules:
       },
     ];
 
-    const requestBody: ChatCompletionRequest = {
-      model: this.config.model,
-      messages,
-      temperature: 0.3, // Lower temperature for more consistent translations
-      max_tokens: 1000,
-    };
-
-    const response = await fetch(`${this.config.baseUrl}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.config.apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody),
-    });
-
-    if (!response.ok) {
-      const errorBody = await response.text().catch(() => '');
-      let errorMessage = response.statusText || 'Unknown error';
-      try {
-        const errorJson = JSON.parse(errorBody);
-        errorMessage = errorJson.error?.message || errorJson.message || errorMessage;
-      } catch {
-        if (errorBody) errorMessage = errorBody;
-      }
-      throw new Error(`OpenAI API Error: ${errorMessage}`);
-    }
-
-    const data: ChatCompletionResponse = await response.json();
-    const translatedText = data.choices[0]?.message?.content?.trim();
-
-    if (!translatedText) {
-      throw new Error('OpenAI API returned empty translation');
-    }
-
-    return translatedText;
+    return this.requestCompletion(messages, 1000);
   }
 
   /**
@@ -154,40 +137,7 @@ Third translation here`;
       },
     ];
 
-    const requestBody: ChatCompletionRequest = {
-      model: this.config.model,
-      messages,
-      temperature: 0.3,
-      max_tokens: 4000,
-    };
-
-    const response = await fetch(`${this.config.baseUrl}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.config.apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody),
-    });
-
-    if (!response.ok) {
-      const errorBody = await response.text().catch(() => '');
-      let errorMessage = response.statusText || 'Unknown error';
-      try {
-        const errorJson = JSON.parse(errorBody);
-        errorMessage = errorJson.error?.message || errorJson.message || errorMessage;
-      } catch {
-        if (errorBody) errorMessage = errorBody;
-      }
-      throw new Error(`OpenAI API Error: ${errorMessage}`);
-    }
-
-    const data: ChatCompletionResponse = await response.json();
-    const content = data.choices[0]?.message?.content?.trim();
-
-    if (!content) {
-      throw new Error('OpenAI API returned empty translation');
-    }
+    const content = await this.requestCompletion(messages, 4000);
 
     // Parse delimiter-separated response
     const translations = content.split(DELIMITER).map(t => t.trim());
@@ -204,6 +154,61 @@ Third translation here`;
     }
 
     return translations;
+  }
+
+  /**
+   * Send one chat-completions request and return the trimmed, non-empty content
+   */
+  private async requestCompletion(messages: ChatMessage[], maxTokens: number): Promise<string> {
+    // Parsed per request so an invalid stored value surfaces as a translate error
+    // instead of making the factory throw.
+    const extra = parseExtraBody(this.config.extraBody);
+    if (!extra.ok) {
+      throw new Error(`Invalid extra request body in settings: ${extra.error}`);
+    }
+
+    const body: Record<string, unknown> = {
+      temperature: 0.3, // Lower temperature for more consistent translations
+      max_tokens: maxTokens,
+      ...extra.value, // may override temperature/max_tokens or add fields
+      model: this.config.model, // core fields always win
+      messages,
+    };
+    // A null in the extra body means "omit this field": some endpoints reject
+    // max_tokens or temperature. JSON.stringify would otherwise send null.
+    for (const [key, value] of Object.entries(body)) {
+      if (value === null) delete body[key];
+    }
+
+    const response = await fetch(`${this.config.baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.config.apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text().catch(() => '');
+      let errorMessage = response.statusText || 'Unknown error';
+      try {
+        const errorJson = JSON.parse(errorBody);
+        errorMessage = errorJson.error?.message || errorJson.message || errorMessage;
+      } catch {
+        if (errorBody) errorMessage = errorBody;
+      }
+      throw new Error(`OpenAI API Error: ${errorMessage}`);
+    }
+
+    const data: ChatCompletionResponse = await response.json();
+    const content = data?.choices?.[0]?.message?.content?.trim();
+
+    if (!content) {
+      throw new Error('OpenAI API returned empty translation');
+    }
+
+    return content;
   }
 
   /**

@@ -44,6 +44,7 @@ export function createTranslationClient(settings: Settings): TranslationClient {
         apiKey: settings.apiKeys.openai,
         baseUrl: settings.openaiConfig.baseUrl,
         model: settings.openaiConfig.model,
+        extraBody: settings.openaiConfig.extraBody,
       });
 
     case 'chrome-builtin':
