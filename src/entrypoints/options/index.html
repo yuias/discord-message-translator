@@ -134,6 +134,16 @@
             <input type="text" id="openaiModel" placeholder="gpt-6-luna" class="input input-sm w-full" />
             <p class="text-xs text-base-content/60" data-i18n="options_modelHint">Model name as expected by the endpoint</p>
           </div>
+          <div class="flex flex-col w-full">
+            <label class="label py-0">
+              <span class="text-xs" data-i18n="options_extraBody">Extra request body (JSON)</span>
+            </label>
+            <textarea id="openaiExtraBody" rows="3" spellcheck="false"
+              placeholder='{"reasoning_effort": "low"}'
+              class="textarea textarea-sm w-full font-mono"></textarea>
+            <p id="openaiExtraBodyError" class="text-xs text-error hidden"></p>
+            <p class="text-xs text-base-content/60" data-i18n="options_extraBodyHint">Optional JSON object merged into every request, e.g. {"reasoning_effort": "low"}. Set a field to null to remove it, e.g. {"max_tokens": null}.</p>
+          </div>
         </div>
 
         <!-- Chrome Built-in message -->

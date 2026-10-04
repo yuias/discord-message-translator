@@ -196,6 +196,18 @@
   "options_modelHint": {
     "message": "エンドポイントが受け付けるモデル名"
   },
+  "options_extraBody": {
+    "message": "追加リクエストボディ (JSON)"
+  },
+  "options_extraBodyHint": {
+    "message": "すべてのリクエストに追加される JSON オブジェクト (任意)。例: {\"reasoning_effort\": \"low\"}。null を指定するとそのフィールドを送信しません。例: {\"max_tokens\": null}"
+  },
+  "options_extraBodyInvalid": {
+    "message": "JSON が不正なため保存していません: $ERROR$",
+    "placeholders": {
+      "error": { "content": "$1" }
+    }
+  },
   "options_cacheDuration": {
     "message": "キャッシュ期間"
   },

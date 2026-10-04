@@ -196,6 +196,18 @@
   "options_modelHint": {
     "message": "Model name as expected by the endpoint"
   },
+  "options_extraBody": {
+    "message": "Extra request body (JSON)"
+  },
+  "options_extraBodyHint": {
+    "message": "Optional JSON object merged into every request, e.g. {\"reasoning_effort\": \"low\"}. Set a field to null to remove it, e.g. {\"max_tokens\": null}."
+  },
+  "options_extraBodyInvalid": {
+    "message": "Invalid JSON, not saved: $ERROR$",
+    "placeholders": {
+      "error": { "content": "$1" }
+    }
+  },
   "options_cacheDuration": {
     "message": "Cache Duration"
   },

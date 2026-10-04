@@ -50,6 +50,37 @@ describe('createAutoSaver', () => {
     });
   });
 
+  it('keeps extraBody when a later openaiConfig update omits it', async () => {
+    vi.mocked(updateSettings).mockResolvedValue(undefined);
+    const autoSave = createAutoSaver(vi.fn());
+
+    autoSave({ openaiConfig: { baseUrl: 'u', model: 'm', extraBody: '{"a":1}' } });
+    autoSave({ openaiConfig: { baseUrl: 'u2', model: 'm' } });
+
+    await vi.advanceTimersByTimeAsync(500);
+
+    expect(updateSettings).toHaveBeenCalledTimes(1);
+    expect(updateSettings).toHaveBeenCalledWith({
+      openaiConfig: { baseUrl: 'u2', model: 'm', extraBody: '{"a":1}' },
+    });
+  });
+
+  it('keeps pending openaiConfig when a later update sets it to undefined', async () => {
+    vi.mocked(updateSettings).mockResolvedValue(undefined);
+    const autoSave = createAutoSaver(vi.fn());
+
+    autoSave({ openaiConfig: { baseUrl: 'u', model: 'm', extraBody: '{"a":1}' } });
+    autoSave({ apiKeys: { openai: undefined }, openaiConfig: undefined });
+
+    await vi.advanceTimersByTimeAsync(500);
+
+    expect(updateSettings).toHaveBeenCalledTimes(1);
+    expect(updateSettings).toHaveBeenCalledWith({
+      apiKeys: { openai: undefined },
+      openaiConfig: { baseUrl: 'u', model: 'm', extraBody: '{"a":1}' },
+    });
+  });
+
   it('calls onError when updateSettings rejects', async () => {
     const error = new Error('save failed');
     vi.mocked(updateSettings).mockRejectedValue(error);

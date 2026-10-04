@@ -1,4 +1,5 @@
 import type { AvailabilityStatus } from '@/lib/api/chrome-builtin';
+import { parseExtraBody } from '@/lib/api/openai-compatible';
 import { getSettings } from '@/lib/utils/settings';
 import { createStorage } from '@/lib/cache/factory';
 import { populateLanguageSelect, setupPasswordToggle } from '@/lib/utils/dom-helpers';
@@ -30,6 +31,8 @@ const openaiApiKeyInput = document.getElementById('openaiApiKey') as HTMLInputEl
 const toggleOpenaiApiKeyVisibility = document.getElementById('toggleOpenaiApiKeyVisibility') as HTMLButtonElement;
 const openaiBaseUrlInput = document.getElementById('openaiBaseUrl') as HTMLInputElement;
 const openaiModelInput = document.getElementById('openaiModel') as HTMLInputElement;
+const openaiExtraBodyInput = document.getElementById('openaiExtraBody') as HTMLTextAreaElement;
+const openaiExtraBodyError = document.getElementById('openaiExtraBodyError') as HTMLParagraphElement;
 const chromeBuiltinSection = document.getElementById('chromeBuiltinSection') as HTMLDivElement;
 const cacheTTLDaysInput = document.getElementById('cacheTTLDays') as HTMLInputElement;
 const cacheTTLValue = document.getElementById('cacheTTLValue') as HTMLSpanElement;
@@ -142,6 +145,7 @@ async function loadSettings() {
   openaiApiKeyInput.value = settings.apiKeys.openai || '';
   openaiBaseUrlInput.value = settings.openaiConfig?.baseUrl || 'https://api.openai.com/v1';
   openaiModelInput.value = settings.openaiConfig?.model || '';
+  openaiExtraBodyInput.value = settings.openaiConfig?.extraBody || '';
   cacheTTLDaysInput.value = settings.cacheTTLDays.toString();
   updateCacheTTLDisplay(settings.cacheTTLDays);
 
@@ -248,6 +252,26 @@ openaiModelInput.addEventListener('input', () => {
   const baseUrl = openaiBaseUrlInput.value.trim() || 'https://api.openai.com/v1';
   const model = openaiModelInput.value.trim();
   autoSave({ openaiConfig: { baseUrl, model } });
+});
+
+// OpenAI extra request body input
+openaiExtraBodyInput.addEventListener('input', () => {
+  const text = openaiExtraBodyInput.value.trim();
+  const parsed = parseExtraBody(text);
+  if (!parsed.ok) {
+    // Not saved: a stored invalid body would make every translate call throw.
+    openaiExtraBodyError.textContent = t('options_extraBodyInvalid', [parsed.error]);
+    openaiExtraBodyError.classList.remove('hidden');
+    openaiExtraBodyInput.classList.add('textarea-error');
+    return;
+  }
+  openaiExtraBodyError.textContent = '';
+  openaiExtraBodyError.classList.add('hidden');
+  openaiExtraBodyInput.classList.remove('textarea-error');
+
+  const baseUrl = openaiBaseUrlInput.value.trim() || 'https://api.openai.com/v1';
+  const model = openaiModelInput.value.trim();
+  autoSave({ openaiConfig: { baseUrl, model, extraBody: text } });
 });
 
 // Toggle API Key visibility
