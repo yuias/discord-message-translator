@@ -188,6 +188,6 @@ options page (detailed configuration). Open the options page from the popup's
 - Custom translation prompts for LLM providers
 - Translation quality feedback system
 
-## License
+## Licence
 
-MIT
+[MIT](LICENSE)
